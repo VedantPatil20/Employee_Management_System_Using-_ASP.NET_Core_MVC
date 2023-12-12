@@ -18,43 +18,43 @@
                 <h5 class="modal-title" id="AddEmployeeModalLabel">Add New Employee</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form asp-action="Create" enctype="multipart/form-data">
+            <form id="save-form">
 
                 <div class="modal-body">
                     <div>
                         <div class="row">
                             <div class="col-6">
                                 <label for="firstName" class="form-label">First Name</label>
-                                <input id="firstName" type="text" class="form-control">
+                                <input id="firstName" name="FirstName" type="text" class="form-control">
                             </div>
                             <div class="col-6">
                                 <label for="lastName" class="form-label">Last Name</label>
-                                <input id="lastName" type="text" class="form-control">
+                                <input id="lastName" name="LastName" type="text" class="form-control">
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-12">
                                 <label for="emailId" class="form-label">Email</label>
-                                <input id="emailId" type="email" class="form-control">
+                                <input id="emailId" name="EmailId" type="email" class="form-control">
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-8">
                                 <label for="contactNo" class="form-label">Contact No.</label>
-                                <input id="contactNo" type="tel" class="form-control">
+                                <input id="contactNo" name="ContactNo" type="tel" class="form-control">
                             </div>
                             <div class="col-4">
                                 <label for="age" class="form-label">Age</label>
-                                <input id="age" type="number" class="form-control">
+                                <input id="age" name="Age" type="number" class="form-control">
                             </div>
                         </div>
 
                         <div class="row">
                             <div class="col-12">
                                 <label for="imageFile" class="form-label">Image</label>
-                                <input id="imageFile" type="file" class="form-control">
+                                <input id="imageFile" name="ImageFile" type="file" class="form-control">
                             </div>
                         </div>
 
@@ -78,26 +78,26 @@
     int count = Model.Count(); // get the number of records in the database
     if (count == 0) // if the database is empty
     {
-        <h2 class="text-center">No data available</h2>
+                <h2 class="text-center">No data available</h2>
     }
     else 
     {
-        <table class="table" id="myTable" style="width:100% !important">
-            <thead>
-                <tr>
-                    <th>Employee Id</th>
-                    <th>Profile Image</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Contact No</th>
-                    <th>Email Id</th>
-                    <th>Age</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
+                <table class="table" id="myTable" style="width:100% !important">
+                    <thead>
+                        <tr>
+                            <th>Employee Id</th>
+                            <th>Profile Image</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Contact No</th>
+                            <th>Email Id</th>
+                            <th>Age</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
     }
 }
 
@@ -142,22 +142,33 @@
                 Success = false; // doesn't go here
             }
         });
+
+        $('#save-form').submit(function (event) {
+            event.preventDefault();
+
+            var formData = new FormData(this); // Capture form data
+
+            $.ajax({
+                type: "Post",
+                url: "/Employee/Create",
+                data: formData,
+                processData: false, // Prevent jQuery from automatically processing the data
+                contentType: false, // Set content type to false to prevent jQuery from adding a Content-Type header
+                success: function (response) {
+                    alert("Employee Data Saved Successfully.");
+                    $('AddEmployeeModel').modal('hide');
+                    location.reload();
+                },
+                error: function (status, error) {
+                    console.error('Error saving employee data:', error);
+                }
+
+            })
+
+        });
+
     });
 
-    function edit(id) {
-        debugger;
-        $.ajax(
-            {
-                type: "Get",
-                url: "/Employee/EmployeesList?id=" + id,
-                success: function (data) {
-                    $("#firstName").html(data.firstName);
-                    $("#lastName").html(data.lastName);
-                    $("#contactNo").html(data.contactNo);
-                    $("#emailId").html(data.emailId);
-                    $("#age").html(data.age);
-                }
-            }
-        )
-    }
+    
+
 </script>
