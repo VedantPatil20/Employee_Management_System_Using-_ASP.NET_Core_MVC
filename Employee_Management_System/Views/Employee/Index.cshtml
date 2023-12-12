@@ -1,0 +1,163 @@
+﻿@model IEnumerable<Employee_Management_System.Models.EmployeeModel>;
+
+@{
+    ViewData["Title"] = "Employee List";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddEmployeeModal">ADD</button>
+
+<!-- Modal -->
+<div class="modal fade" id="AddEmployeeModal" tabindex="-1" aria-labelledby="AddEmployeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="AddEmployeeModalLabel">Add New Employee</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="Create" enctype="multipart/form-data">
+
+                <div class="modal-body">
+                    <div>
+                        <div class="row">
+                            <div class="col-6">
+                                <label for="firstName" class="form-label">First Name</label>
+                                <input id="firstName" type="text" class="form-control">
+                            </div>
+                            <div class="col-6">
+                                <label for="lastName" class="form-label">Last Name</label>
+                                <input id="lastName" type="text" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <label for="emailId" class="form-label">Email</label>
+                                <input id="emailId" type="email" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-8">
+                                <label for="contactNo" class="form-label">Contact No.</label>
+                                <input id="contactNo" type="tel" class="form-control">
+                            </div>
+                            <div class="col-4">
+                                <label for="age" class="form-label">Age</label>
+                                <input id="age" type="number" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12">
+                                <label for="imageFile" class="form-label">Image</label>
+                                <input id="imageFile" type="file" class="form-control">
+                            </div>
+                        </div>
+
+                    </div>
+                
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@{
+    int count = Model.Count(); // get the number of records in the database
+    if (count == 0) // if the database is empty
+    {
+        <h2 class="text-center">No data available</h2>
+    }
+    else 
+    {
+        <table class="table" id="myTable" style="width:100% !important">
+            <thead>
+                <tr>
+                    <th>Employee Id</th>
+                    <th>Profile Image</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Contact No</th>
+                    <th>Email Id</th>
+                    <th>Age</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    }
+}
+
+<script>
+    $(document).ready(function () {
+        debugger;
+        // $('#example').DataTable();
+
+        $.ajax({
+            type: "Get",
+            url: "/Employee/EmployeesList",
+            success: function (data) {
+                $('#myTable').DataTable({
+                    data: data,
+                    columns: [
+                        { data: 'id' },
+                        { 
+                            data: 'imagePath',
+                            mRender: function (data, type, row) {
+                                return '<img class="rounded-circle" src="/images/' + data + '" width="30px" />';
+                            }
+                        },
+                        { data: 'firstName' },
+                        { data: 'lastName' },
+                        { data: 'contactNo' },
+                        { data: 'emailId' },
+                        { data: 'age' },
+                        { 
+                            data: null,
+                            mRender: function (data, type, row) {
+                                // return '<a href="/Employee/Edit/' + row.id + '" class="btn btn-primary btn-sm">Edit</a> | <a href="/Employee/Delete/' + row.id + '" class="btn btn-danger btn-sm">Delete</a>';
+                                return `<button type="button" class="btn btn-primary" onclick=edit(` + row.id + `) data-bs-toggle="modal" data-bs-target="#AddEmployeeModal">Edit</button>
+                                            |
+                                            <a href="/Employee/Delete/' + row.id + '" class="btn btn-danger btn-sm">Delete</a>`
+                            }
+                        }
+                    ]
+                });
+                // Success = true; // doesn't go here
+            },
+            error: function(textStatus, errorThrown) {
+                Success = false; // doesn't go here
+            }
+        });
+    });
+
+    function edit(id) {
+        debugger;
+        $.ajax(
+            {
+                type: "Get",
+                url: "/Employee/EmployeesList?id=" + id,
+                success: function (data) {
+                    $("#firstName").html(data.firstName);
+                    $("#lastName").html(data.lastName);
+                    $("#contactNo").html(data.contactNo);
+                    $("#emailId").html(data.emailId);
+                    $("#age").html(data.age);
+                }
+            }
+        )
+    }
+</script>

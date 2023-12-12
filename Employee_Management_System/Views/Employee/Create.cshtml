@@ -1,0 +1,42 @@
+﻿@model Employee_Management_System.Models.EmployeeModel 
+
+@{
+    ViewData["Title"] = "Add New Employee";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+
+    <div class="mb-3">
+        <label asp-for="FirstName" class="form-label">First Name</label>
+        <input asp-for="FirstName" type="text" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="LastName" class="form-label">Last Name</label>
+        <input asp-for="LastName" type="text" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ContactNo" class="form-label">Contact No</label>
+        <input asp-for="ContactNo" type="tel" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="EmailId" class="form-label">Email</label>
+        <input asp-for="EmailId" type="email" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Age" class="form-label">Age</label>
+        <input asp-for="Age" type="number" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="imageFile" class="form-label">Image</label>
+        <input asp-for="imageFile" type="file" class="form-control">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
