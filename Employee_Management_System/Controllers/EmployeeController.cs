@@ -174,8 +174,12 @@ namespace Employee_Management_System.Controllers
                 {
                     const string queryString = "insert into employee (FirstName, LastName, ContactNo, EmailId, Age, ImagePath) values (@FirstName, @LastName, @ContactNo, @EmailId, @Age, @ImagePath);";
 
+                    // const string storedProcedureName = "AddAndUpdateEmployee(@FirstName, @LastName, @ContactNo, @EmailId, @Age, @ImagePath)";
+
                     using (MySqlCommand command = new MySqlCommand(queryString, connection))
                     {
+                        // command.CommandType = CommandType.StoredProcedure;
+
                         connection.Open();
 
                         command.Parameters.AddWithValue("@FirstName", employee.FirstName);
@@ -295,84 +299,7 @@ namespace Employee_Management_System.Controllers
                 {
                     string queryString = "UPDATE employee SET FirstName = @FirstName, LastName = @LastName, ContactNo = @ContactNo, EmailId = @EmailId, Age = @Age, ImagePath = @ImagePath WHERE Id = @Id;";
 
-                    using (MySqlCommand command = new MySqlCommand(queryString, connection))
-                    {
-
-                        command.Parameters.AddWithValue("@Id", id);
-                        command.Parameters.AddWithValue("@FirstName", employee.FirstName);
-                        command.Parameters.AddWithValue("@LastName", employee.LastName);
-                        command.Parameters.AddWithValue("@ContactNo", employee.ContactNo);
-                        command.Parameters.AddWithValue("@EmailId", employee.EmailId);
-                        command.Parameters.AddWithValue("@Age", employee.Age);
-                        command.Parameters.AddWithValue("@ImagePath", employee.ImagePath);
-
-                        connection.Open();
-
-                        command.ExecuteNonQuery();
-
-                    }
-                }
-
-            }
-
-            catch (Exception Ex)
-            {
-                Console.WriteLine(Ex.Message);
-            }
-
-            return RedirectToAction("Index");
-        }
-
-        [HttpPost]
-        public IActionResult EditData(int id, EmployeeModel employee)
-        {
-            try
-            {
-                // get existing profile image from database
-                string existingImage = null;
-
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    string queryString = "SELECT ImagePath FROM employee WHERE ID = @Id";
-
-                    using (MySqlCommand command = new MySqlCommand(queryString, connection))
-                    {
-                        command.Parameters.AddWithValue("@Id", id);
-
-                        connection.Open();
-
-                        using (var reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                existingImage = reader["ImagePath"].ToString();
-                            }
-                        }
-                    }
-                }
-
-                // If a new image file is uploaded, update the profile image
-
-                if(employee.imageFile != null)
-                {
-                    // Delete the old image file if it exists
-
-                    if (!string.IsNullOrEmpty(existingImage))
-                    {
-                        string oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", existingImage);
-
-                        if (System.IO.File.Exists(oldImagePath))
-                        {
-                            System.IO.File.Delete(oldImagePath);
-                        }
-                    }
-
-                    employee.ImagePath = UploadImage(employee.imageFile);
-                }
-
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    string queryString = "UPDATE employee SET FirstName = @FirstName, LastName = @LastName, ContactNo = @ContactNo, EmailId = @EmailId, Age = @Age, ImagePath = @ImagePath WHERE Id = @Id;";
+                    // const string storedProcedureName = "AddAndUpdateEmployee(@Id, @FirstName, @LastName, @ContactNo, @EmailId, @Age, @ImagePath)";
 
                     using (MySqlCommand command = new MySqlCommand(queryString, connection))
                     {
