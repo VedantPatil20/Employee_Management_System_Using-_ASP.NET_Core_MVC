@@ -8,13 +8,13 @@
 
         public string LastName { get; set; }
 
-        public string ContactNo { get; set; }
-
         public string EmailId { get; set; }
+
+        public string ContactNo { get; set; }
 
         public int Age { get; set; }
 
-        public string ImagePath { get; set; }
+        public string ProfileImage { get; set; }
 
         public IFormFile imageFile { get; set; }
 

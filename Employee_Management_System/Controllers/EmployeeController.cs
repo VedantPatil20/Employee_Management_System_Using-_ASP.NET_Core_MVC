@@ -1,163 +1,146 @@
 ﻿using Employee_Management_System.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using MySql.Data.MySqlClient;
 using System.Data;
 
-namespace Employee_Management_System.Controllers
+namespace Employee_Mnagement_System.Controllers
 {
     public class EmployeeController : Controller
     {
-        public IConfiguration _configuration;
-        public string connectionString;
+        private readonly IConfiguration _configuration;
+        private string connectionString;
 
         public EmployeeController(IConfiguration configuration)
         {
             _configuration = configuration;
-            connectionString = configuration.GetConnectionString("DefaultConnection");
+            connectionString = _configuration.GetConnectionString("DefaultConnection");
         }
 
-        // Get All Employees
         public IActionResult Index()
         {
             List<EmployeeModel> employeeList = new List<EmployeeModel>();
+            // const string Query = "select * from employee;";
 
-            try
+            const string StoredProcedure = "GetEmployeeData";
+
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlCommand command = new MySqlCommand(StoredProcedure, connection))
                 {
-                    const string storedProcedureName = "GetAllEmployees";
+                    command.CommandType = CommandType.StoredProcedure;
 
-                    using (MySqlCommand command = new MySqlCommand(storedProcedureName, connection))
+                    connection.Open();
+
+                    MySqlDataReader reader = command.ExecuteReader();
+
+                    while (reader.Read())
                     {
-                        // Set the command type to stored procedure
-                        command.CommandType = CommandType.StoredProcedure;
+                        EmployeeModel employee = new EmployeeModel();
 
-                        connection.Open();
+                        employee.Id = (int)reader["emp_id"];
+                        employee.FirstName = reader["first_name"].ToString();
+                        employee.LastName = reader["last_name"].ToString();
+                        employee.EmailId = reader["email_id"].ToString();
+                        employee.ContactNo = reader["contact_no"].ToString();
+                        employee.Age = (int)reader["emp_age"];
+                        employee.ProfileImage = reader["profile_image"].ToString();
 
-                        MySqlDataReader reader = command.ExecuteReader();
-
-                        while (reader.Read())
-                        {
-                            EmployeeModel employeeModel = new EmployeeModel();
-
-                            // Id, FirstName, LastName, ContactNo, Age
-
-                            employeeModel.Id = (int)reader["Id"];
-                            employeeModel.FirstName = reader["FirstName"].ToString();
-                            employeeModel.LastName = reader["LastName"].ToString();
-                            employeeModel.ContactNo = reader["ContactNo"].ToString();
-                            employeeModel.EmailId = reader["EmailId"].ToString();
-                            employeeModel.Age = (int)reader["Age"];
-                            employeeModel.ImagePath = reader["ImagePath"].ToString();
-
-                            employeeList.Add(employeeModel);
-
-                        }
-
+                        employeeList.Add(employee);
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
             return View(employeeList);
-
         }
 
-        // Get All Employees
+        // List of all employees with JSON (AJAX Function)
         public IActionResult EmployeesList()
         {
             List<EmployeeModel> employeeList = new List<EmployeeModel>();
+            // const string Query = "select * from employee;";
 
-            try
+            const string StoredProcedure = "GetEmployeeData";
+
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlCommand command = new MySqlCommand(StoredProcedure, connection))
                 {
-                    const string storedProcedureName = "GetAllEmployees";
+                    command.CommandType = CommandType.StoredProcedure;
 
-                    using (MySqlCommand command = new MySqlCommand(storedProcedureName, connection))
+                    connection.Open();
+
+                    MySqlDataReader reader = command.ExecuteReader();
+
+                    while (reader.Read())
                     {
-                        // Set the command type to stored procedure
-                        command.CommandType = CommandType.StoredProcedure;
+                        EmployeeModel employee = new EmployeeModel();
 
-                        connection.Open();
+                        employee.Id = (int)reader["emp_id"];
+                        employee.FirstName = reader["first_name"].ToString();
+                        employee.LastName = reader["last_name"].ToString();
+                        employee.EmailId = reader["email_id"].ToString();
+                        employee.ContactNo = reader["contact_no"].ToString();
+                        employee.Age = (int)reader["emp_age"];
+                        employee.ProfileImage = reader["profile_image"].ToString();
 
-                        MySqlDataReader reader = command.ExecuteReader();
-
-                        while (reader.Read())
-                        {
-                            EmployeeModel employeeModel = new EmployeeModel();
-
-                            // Id, FirstName, LastName, ContactNo, Age
-
-                            employeeModel.Id = (int)reader["Id"];
-                            employeeModel.FirstName = reader["FirstName"].ToString();
-                            employeeModel.LastName = reader["LastName"].ToString();
-                            employeeModel.ContactNo = reader["ContactNo"].ToString();
-                            employeeModel.EmailId = reader["EmailId"].ToString();
-                            employeeModel.Age = (int)reader["Age"];
-                            employeeModel.ImagePath = reader["ImagePath"].ToString();
-
-                            employeeList.Add(employeeModel);
-
-                        }
-
+                        employeeList.Add(employee);
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
             return Json(employeeList);
-
         }
 
-        private string UploadImage(IFormFile imageFile)
+        // Get Employee Details by ID
+        public IActionResult GetEmployeeById(int? id)
         {
+            EmployeeModel employeeModel = null;
 
-            try
+            if (id == null)
             {
-                string uniqueFileName = null;
-
-                if (imageFile != null)
-                {
-                    string uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
-
-                    // Create the directory if it doesn't exist
-
-                    if (!Directory.Exists(uploadFolder))
-                    {
-                        Directory.CreateDirectory(uploadFolder);
-                    }
-
-                    uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
-                    string filePath = Path.Combine(uploadFolder, uniqueFileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        imageFile.CopyTo(stream);
-                    }
-
-                }
-                else
-                {
-                    Console.WriteLine("Image file path is null");
-                }
-
-                return uniqueFileName;
+                // Handle null ID case, maybe return an error message or handle it as per your application's logic
+                return BadRequest("Employee ID is null");
             }
-            catch (Exception ex)
+
+            const string StoredProcedure = "GetEmployeeById"; // The stored procedure to fetch employee details
+
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                return ex.Message;
+                using (MySqlCommand command = new MySqlCommand(StoredProcedure, connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    command.Parameters.AddWithValue("@Id", id);
+
+                    connection.Open();
+
+                    using (MySqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            employeeModel = new EmployeeModel();
+
+                            // Populate the employeeModel object with retrieved data
+                            employeeModel.Id = (int)reader["emp_id"];
+                            employeeModel.FirstName = reader["first_name"].ToString();
+                            employeeModel.LastName = reader["last_name"].ToString();
+                            employeeModel.EmailId = reader["email_id"].ToString();
+                            employeeModel.ContactNo = reader["contact_no"].ToString();
+                            employeeModel.Age = (int)reader["emp_age"];
+                            employeeModel.ProfileImage = reader["profile_image"].ToString();
+                        }
+                    }
+                }
             }
+
+            if (employeeModel == null)
+            {
+                // Handle the case where no employee with the given ID was found
+                return NotFound("Employee not found");
+            }
+
+            return Json(employeeModel); // Return the employee details as JSON
         }
 
-        // Add new Employee Details
+
         public IActionResult Create()
         {
             return View();
@@ -166,151 +149,96 @@ namespace Employee_Management_System.Controllers
         [HttpPost]
         public IActionResult Create(EmployeeModel employee)
         {
-            employee.ImagePath = UploadImage(employee.imageFile);
+            employee.ProfileImage = UploadImage(employee.imageFile);
 
-            try
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                // const string Query = "Insert into employee (first_name, last_name, email_id, contact_no, emp_age, profile_image) values (@FirstName, @LastName, @EmailId, @ContactNo, @Age, @ProfileImage);";
+
+                const string StoredProcedure = "InsertEmployee";
+
+                using (MySqlCommand command = new MySqlCommand(StoredProcedure, connection))
                 {
-                    const string queryString = "insert into employee (FirstName, LastName, ContactNo, EmailId, Age, ImagePath) values (@FirstName, @LastName, @ContactNo, @EmailId, @Age, @ImagePath);";
+                    command.CommandType = CommandType.StoredProcedure;
 
-                    // const string storedProcedureName = "AddAndUpdateEmployee(@FirstName, @LastName, @ContactNo, @EmailId, @Age, @ImagePath)";
+                    connection.Open();
 
-                    using (MySqlCommand command = new MySqlCommand(queryString, connection))
-                    {
-                        // command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@FirstName", employee.FirstName);
+                    command.Parameters.AddWithValue("@LastName", employee.LastName);
+                    command.Parameters.AddWithValue("@EmailId", employee.EmailId);
+                    command.Parameters.AddWithValue("@ContactNo", employee.ContactNo);
+                    command.Parameters.AddWithValue("@Age", employee.Age);
+                    command.Parameters.AddWithValue("@ProfileImage", employee.ProfileImage);
 
-                        connection.Open();
-
-                        command.Parameters.AddWithValue("@FirstName", employee.FirstName);
-                        command.Parameters.AddWithValue("@LastName", employee.LastName);
-                        command.Parameters.AddWithValue("@ContactNo", employee.ContactNo);
-                        command.Parameters.AddWithValue("@EmailId", employee.EmailId);
-                        command.Parameters.AddWithValue("@Age", employee.Age);
-                        command.Parameters.AddWithValue("@ImagePath", employee.ImagePath);
-
-                        command.ExecuteNonQuery();
-                    }
+                    command.ExecuteNonQuery();
                 }
             }
-            catch (Exception Ex)
-            {
-                Console.WriteLine(Ex.Message);
-            }
-        
-            return RedirectToAction("Index");
+
+            return Json("Index");
         }
 
-        // Update existing employee details
-        public IActionResult Edit(int? id)
+        public IActionResult populateEditData(int? id)
         {
-
             EmployeeModel employeeModel = null;
 
-            try
+            // const string queryString = "SELECT * FROM employee WHERE emp_id = @Id";
+
+            const string StoredProcedure = "GetEmployeeById";
+
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                using (MySqlCommand command = new MySqlCommand(StoredProcedure, connection))
                 {
-                    const string queryString = "SELECT * FROM employee WHERE Id = @Id";
+                    command.CommandType = CommandType.StoredProcedure;
 
-                    using (MySqlCommand command = new MySqlCommand(queryString, connection))
+                    command.Parameters.AddWithValue("@Id", id);
+
+                    connection.Open();
+
+                    MySqlDataReader reader = command.ExecuteReader();
+
+                    while (reader.Read())
                     {
+                        employeeModel = new EmployeeModel();
 
-                        command.Parameters.AddWithValue("@Id", id);
+                        // Id, FirstName, LastName, ContactNo, Age
 
-                        connection.Open();
+                        employeeModel.Id = (int)reader["emp_id"];
+                        employeeModel.FirstName = reader["first_name"].ToString();
+                        employeeModel.LastName = reader["last_name"].ToString();
+                        employeeModel.EmailId = reader["email_id"].ToString();
+                        employeeModel.ContactNo = reader["contact_no"].ToString();
+                        employeeModel.Age = (int)reader["emp_age"];
+                        employeeModel.ProfileImage = reader["profile_image"].ToString();
 
-                        MySqlDataReader reader = command.ExecuteReader();
-
-                        while (reader.Read())
-                        {
-                            employeeModel = new EmployeeModel();
-
-                            employeeModel.Id = (int)reader["Id"];
-                            employeeModel.FirstName = reader["FirstName"].ToString();
-                            employeeModel.LastName = reader["LastName"].ToString();
-                            employeeModel.ContactNo = reader["ContactNo"].ToString();
-                            employeeModel.EmailId = reader["EmailId"].ToString();
-                            employeeModel.Age = (int)reader["Age"];
-                            employeeModel.ImagePath = reader["imagePath"].ToString();
-
-                        }
                     }
                 }
-
-            } 
-            
-            catch (Exception Ex)
-            {
-                Console.WriteLine(Ex.Message);
             }
 
             return Json(employeeModel);
         }
 
         [HttpPost]
-        public IActionResult Edit(int id, EmployeeModel employee)
+        public IActionResult Edit([FromBody] EmployeeModel employee)
         {
+
             try
             {
-                // get existing profile image from database
-                string existingImage = null;
-
                 using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
-                    string queryString = "SELECT ImagePath FROM employee WHERE ID = @Id";
+                    string StoredProcedure = "UpdateEmployee";
 
-                    using (MySqlCommand command = new MySqlCommand(queryString, connection))
+                    using (MySqlCommand command = new MySqlCommand(StoredProcedure, connection))
                     {
-                        command.Parameters.AddWithValue("@Id", id);
+                        command.CommandType = CommandType.StoredProcedure;
 
-                        connection.Open();
-
-                        using (var reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                existingImage = reader["ImagePath"].ToString();
-                            }
-                        }
-                    }
-                }
-
-                // If a new image file is uploaded, update the profile image
-
-                if (employee.imageFile != null)
-                {
-                    // Delete the old image file if it exists
-
-                    if (!string.IsNullOrEmpty(existingImage))
-                    {
-                        string oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", existingImage);
-
-                        if (System.IO.File.Exists(oldImagePath))
-                        {
-                            System.IO.File.Delete(oldImagePath);
-                        }
-                    }
-
-                    employee.ImagePath = UploadImage(employee.imageFile);
-                }
-
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    string queryString = "UPDATE employee SET FirstName = @FirstName, LastName = @LastName, ContactNo = @ContactNo, EmailId = @EmailId, Age = @Age, ImagePath = @ImagePath WHERE Id = @Id;";
-
-                    // const string storedProcedureName = "AddAndUpdateEmployee(@Id, @FirstName, @LastName, @ContactNo, @EmailId, @Age, @ImagePath)";
-
-                    using (MySqlCommand command = new MySqlCommand(queryString, connection))
-                    {
-
-                        command.Parameters.AddWithValue("@Id", id);
+                        command.Parameters.AddWithValue("@Id", employee.Id);
                         command.Parameters.AddWithValue("@FirstName", employee.FirstName);
                         command.Parameters.AddWithValue("@LastName", employee.LastName);
                         command.Parameters.AddWithValue("@ContactNo", employee.ContactNo);
                         command.Parameters.AddWithValue("@EmailId", employee.EmailId);
                         command.Parameters.AddWithValue("@Age", employee.Age);
-                        command.Parameters.AddWithValue("@ImagePath", employee.ImagePath);
+                        command.Parameters.AddWithValue("@ProfileImage", employee.ProfileImage);
 
                         connection.Open();
 
@@ -320,75 +248,71 @@ namespace Employee_Management_System.Controllers
                 }
 
             }
-
-            catch (Exception Ex)
+            catch (Exception ex)
             {
-                Console.WriteLine(Ex.Message);
+                Console.WriteLine(ex.Message);
             }
-
-            return RedirectToAction("Index");
+            return Json("Index");
         }
 
-        // Delete employee from database
-        public IActionResult Delete(int? id, EmployeeModel employee)
+        public IActionResult Delete(int? id)
         {
-            try
+
+            // get existing profile image from database
+            string existingImage = null;
+
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                // get existing profile image from database
-                string existingImage = null;
+                // string queryString = "SELECT profile_image FROM employee WHERE emp_id = @Id;";
 
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                string StoredProcedure = "GetProfileImageById";
+
+                using (MySqlCommand command = new MySqlCommand(StoredProcedure, connection))
                 {
-                    string queryString = "SELECT ImagePath FROM employee WHERE ID = @Id";
+                    command.CommandType = CommandType.StoredProcedure;
 
-                    using (MySqlCommand command = new MySqlCommand(queryString, connection))
+                    command.Parameters.AddWithValue("@Id", id);
+
+                    connection.Open();
+
+                    using (var reader = command.ExecuteReader())
                     {
-                        command.Parameters.AddWithValue("@Id", id);
-
-                        connection.Open();
-
-                        using (var reader = command.ExecuteReader())
+                        while (reader.Read())
                         {
-                            while (reader.Read())
-                            {
-                                existingImage = reader["ImagePath"].ToString();
-                            }
+                            existingImage = reader["profile_image"].ToString();
                         }
                     }
                 }
+            }
 
-                // If a new image file is uploaded, update the profile image
+            // Delete the old image file if it exists
 
-                // Delete the old image file if it exists
+            if (!string.IsNullOrEmpty(existingImage))
+            {
+                string oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", existingImage);
 
-                if (!string.IsNullOrEmpty(existingImage))
+                if (System.IO.File.Exists(oldImagePath))
                 {
-                    string oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", existingImage);
-
-                    if (System.IO.File.Exists(oldImagePath))
-                    {
-                        System.IO.File.Delete(oldImagePath);
-                    }
-                }
-
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    string queryString = "DELETE FROM employee WHERE Id = @Id";
-
-                    using (MySqlCommand command = new MySqlCommand(queryString, connection))
-                    {
-                        command.Parameters.AddWithValue("@Id", id);
-
-                        connection.Open();
-
-                        command.ExecuteNonQuery();
-                    }
+                    System.IO.File.Delete(oldImagePath);
                 }
             }
 
-            catch (Exception Ex)
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                Console.WriteLine(Ex.Message);
+                // string queryString = "DELETE FROM employee WHERE emp_id = @Id";
+
+                string StoredProcedure = "DeleteEmployee";
+
+                using (MySqlCommand command = new MySqlCommand(StoredProcedure, connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    command.Parameters.AddWithValue("@Id", id);
+
+                    connection.Open();
+
+                    command.ExecuteNonQuery();
+                }
             }
 
             return RedirectToAction("Index");
@@ -399,55 +323,84 @@ namespace Employee_Management_System.Controllers
             return View();
         }
 
-        // Search data by search keyword
         [HttpPost]
         public IActionResult Search(string Search)
         {
             List<EmployeeModel> employeeList = new List<EmployeeModel>();
+            // string Query = "SELECT * FROM employee WHERE emp_id = @search OR first_name LIKE @search OR last_name LIKE @search OR email_id LIKE @search OR contact_no = @search OR emp_age LIKE @search;";
+            string StoredProcedure = "SearchEmployee";
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                const string queryString = "SELECT * FROM employee WHERE Id LIKE @Search OR FirstName LIKE @Search OR LastName LIKE @Search OR ContactNo = @Search OR EmailId LIKE @Search OR Age LIKE @Search;";
-
-                using (MySqlCommand command = new MySqlCommand(queryString, connection))
+                using (MySqlCommand command = new MySqlCommand(StoredProcedure, connection))
                 {
-                    command.Parameters.AddWithValue("@Search", "%" + Search + "%");
+                    command.CommandType = CommandType.StoredProcedure;
 
+                    command.Parameters.AddWithValue("@search", "%" + Search + "%");
                     connection.Open();
 
                     MySqlDataReader reader = command.ExecuteReader();
 
                     while (reader.Read())
                     {
-                        EmployeeModel employeeModel = new EmployeeModel();
+                        EmployeeModel employee = new EmployeeModel();
 
-                        employeeModel.Id = (int)reader["Id"];
-                        employeeModel.FirstName = reader["FirstName"].ToString();
-                        employeeModel.LastName = reader["LastName"].ToString();
-                        employeeModel.ContactNo = reader["ContactNo"].ToString();
-                        employeeModel.EmailId = reader["EmailId"].ToString();
-                        employeeModel.Age = (int)reader["Age"];
+                        employee.Id = (int)reader["emp_id"];
+                        employee.FirstName = reader["first_name"].ToString();
+                        employee.LastName = reader["last_name"].ToString();
+                        employee.EmailId = reader["email_id"].ToString();
+                        employee.ContactNo = reader["contact_no"].ToString();
+                        employee.Age = (int)reader["emp_age"];
 
-                        employeeList.Add(employeeModel);
-
+                        employeeList.Add(employee);
                     }
                 }
             }
-
-            try
-            {
-
-            }
-
-            catch (Exception Ex)
-            {
-                Console.WriteLine(Ex.Message);
-            }
-
             return View("Index", employeeList);
         }
 
+        // Upload Image to file system
+        private string UploadImage(IFormFile imageFile)
+        {
+            try
+            {
+                string uniqueFileName = null;
 
+                if (imageFile != null)
+                {
+                    // creating a string uploadFolder that contains the path to the images folder inside the wwwroot directory of your application
+                    string uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
+
+                    // Create the directory if it doesn't exist
+                    if (!Directory.Exists(uploadFolder))
+                    {
+                        Directory.CreateDirectory(uploadFolder);
+                    }
+
+                    // Rename upload image name to some unique file name
+                    uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+
+                    // creating a string "filePath" that contains the full path to where the file will be saved.
+                    string filePath = Path.Combine(uploadFolder, uniqueFileName);
+
+                    // creating a new FileStream object that represents the file at filePath
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        // copying the contents of imageFile to the stream
+                        imageFile.CopyTo(stream);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Image File is Null");
+                }
+                return uniqueFileName;
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
 
     }
 }

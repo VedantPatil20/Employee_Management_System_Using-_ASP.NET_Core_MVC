@@ -1,240 +1,293 @@
 ﻿@model IEnumerable<Employee_Management_System.Models.EmployeeModel>;
 
 @{
-    ViewData["Title"] = "Employee List";
+    ViewData["title"] = "Employee Details";
 }
 
-<h2>@ViewData["Title"]</h2>
+<!-- Button trigger modal for Save Data -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#saveEmployeeModal">Add New Employee</button>
 
-<!-- Button trigger modal for Add New Employee Details -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddEmployeeModal">ADD</button>
-
-<!-- Modal for Add New Employee Details -->
-<div class="modal fade" id="AddEmployeeModal" tabindex="-1" aria-labelledby="AddEmployeeModalLabel" aria-hidden="true">
+<!-- Modal for Save Data -->
+<div class="modal fade" id="saveEmployeeModal" tabindex="-1" aria-labelledby="saveEmployeeModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-
             <div class="modal-header">
-                <h5 class="modal-title" id="AddEmployeeModalLabel">Add New Employee</h5>
+                <h5 class="modal-title" id="saveEmployeeModalLabel">Add New Employee</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="save-form">
+
+            <form id="employeeForm">
 
                 <div class="modal-body">
-                    <div>
-                        <div class="row">
-                            <div class="col-6">
-                                <label for="ins_firstname" class="form-label">First Name</label>
-                                <input id="ins_firstname" name="FirstName" type="text" class="form-control" autocomplete="off">
-                            </div>
-                            <div class="col-6">
-                                <label for="ins_lastname" class="form-label">Last Name</label>
-                                <input id="ins_lastname" name="LastName" type="text" class="form-control" autocomplete="off">
-                            </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label for="firstName" class="form-label">First Name</label>
+                            <input id="firstName" name="FirstName" type="text" class="form-control" autocomplete="off">
                         </div>
-
-                        <div class="row">
-                            <div class="col-12">
-                                <label for="ins_emailid" class="form-label">Email</label>
-                                <input id="ins_emailid" name="EmailId" type="email" class="form-control" autocomplete="off">
-                            </div>
+                        <div class="col-6">
+                            <label for="lastName" class="form-label">Last Name</label>
+                            <input id="lastName" name="LastName" type="text" class="form-control" autocomplete="off">
                         </div>
-
-                        <div class="row">
-                            <div class="col-8">
-                                <label for="ins_contactno" class="form-label">Contact No.</label>
-                                <input id="ins_contactno" name="ContactNo" type="tel" class="form-control" autocomplete="off">
-                            </div>
-                            <div class="col-4">
-                                <label for="ins_age" class="form-label">Age</label>
-                                <input id="ins_age" name="Age" type="number" class="form-control" autocomplete="off">
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-12">
-                                <label for="ins_imagefile" class="form-label">Image</label>
-                                <input id="ins_imagefile" name="ImageFile" type="file" class="form-control" autocomplete="off">
-                            </div>
-                        </div>
-
                     </div>
-                
+
+                    <div class="row">
+                        <div class="col-12">
+                            <label for="emailId" class="form-label">Email</label>
+                            <input id="emailId" name="EmailId" type="text" class="form-control" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-8">
+                            <label for="contactNo" class="form-label">Contact No.</label>
+                            <input id="contactNo" name="ContactNo" type="text" class="form-control" autocomplete="off">
+                        </div>
+                        <div class="col-4">
+                            <label for="age" class="form-label">Age</label>
+                            <input id="age" name="Age" type="text" class="form-control" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-8">
+                            <label for="imageFile" class="form-label">Profile Image</label>
+                            <input id="imageFile" name="imageFile" type="file" class="form-control">
+                        </div>
+                    </div>
 
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-success" onclick="saveEmployee()">Save changes</button>
                 </div>
 
             </form>
-
         </div>
     </div>
 </div>
 
-<!-- Modal for Update Employee Details -->
-<div class="modal fade" id="UpdateEmployeeModal" tabindex="-1" aria-labelledby="UpdateEmployeeModalLabel" aria-hidden="true">
+<!-- Modal for Update Data -->
+<div class="modal fade" id="updateEmployeeModal" tabindex="-1" aria-labelledby="updateEmployeeModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-
             <div class="modal-header">
-                <h5 class="modal-title" id="UpdateEmployeeModalLabel">Update Employee</h5>
+                <h5 class="modal-title" id="updateEmployeeModalLabel">Update Employee</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="edit-form">
+
+            <form id="updateForm">
 
                 <div class="modal-body">
-                    <div>
-                        <div class="row">
-                            <div class="col-6">
-                                <label for="firstname" class="form-label">First Name</label>
-                                <input id="firstname" name="FirstName" type="text" class="form-control" autocomplete="off">
-                            </div>
-                            <div class="col-6">
-                                <label for="lastname" class="form-label">Last Name</label>
-                                <input id="lastname" name="LastName" type="text" class="form-control" autocomplete="off">
-                            </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <label for="firstName_u" class="form-label">First Name</label>
+                            <input id="firstName_u" name="FirstName" type="text" class="form-control" autocomplete="off">
                         </div>
-
-                        <div class="row">
-                            <div class="col-12">
-                                <label for="emailid" class="form-label">Email</label>
-                                <input id="emailid" name="EmailId" type="email" class="form-control" autocomplete="off">
-                            </div>
+                        <div class="col-6">
+                            <label for="lastName_u" class="form-label">Last Name</label>
+                            <input id="lastName_u" name="LastName" type="text" class="form-control" autocomplete="off">
                         </div>
-
-                        <div class="row">
-                            <div class="col-8">
-                                <label for="contactno" class="form-label">Contact No.</label>
-                                <input id="contactno" name="ContactNo" type="tel" class="form-control" autocomplete="off">
-                            </div>
-                            <div class="col-4">
-                                <label for="age" class="form-label">Age</label>
-                                <input id="age" name="Age" type="number" class="form-control" autocomplete="off">
-                            </div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-12">
-                                <label for="imagefile" class="form-label">Image</label>
-                                <input id="imagefile" name="ImageFile" type="file" class="form-control" autocomplete="off">
-                            </div>
-                        </div>
-
                     </div>
-                
+
+                    <div class="row">
+                        <div class="col-12">
+                            <label for="emailId_u" class="form-label">Email</label>
+                            <input id="emailId_u" name="EmailId" type="text" class="form-control" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-8">
+                            <label for="contactNo_u" class="form-label">Contact No.</label>
+                            <input id="contactNo_u" name="ContactNo" type="text" class="form-control" autocomplete="off">
+                        </div>
+                        <div class="col-4">
+                            <label for="age_u" class="form-label">Age</label>
+                            <input id="age_u" name="Age" type="text" class="form-control" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-8">
+                            <label for="imageFile_u" class="form-label">Profile Image</label>
+                            <input id="imageFile_u" name="imageFile" type="file" class="form-control">
+                        </div>
+                    </div>
 
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-success" onclick="updateEmployee()">Update changes</button>
                 </div>
 
             </form>
-
         </div>
     </div>
 </div>
 
+<hr/>
 
+<h3 class="text-decoration-underline">@ViewData["title"]</h3>
 
-@{
-    int count = Model.Count(); // get the number of records in the database
-    if (count == 0) // if the database is empty
-    {
-            <h2 class="text-center">No data available</h2>
-    }
-    else 
-    {
-            <table class="table" id="myTable" style="width:100% !important">
-                <thead>
-                    <tr>
-                        <th>Employee Id</th>
-                        <th>Profile Image</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Contact No</th>
-                        <th>Email Id</th>
-                        <th>Age</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    
-                </tbody>
-            </table>
-    }
+@if (Model.Any())
+{
+    <table class="table" id="emp-table">
+        <thead>
+            <tr>
+                <th>Profile</th>
+                <th>Employee Id</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Contact No</th>
+                <th>Email Id</th>
+                <th>Age</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @* Use AJAX for displaying data *@
+        </tbody>
+    </table>
+}
+else
+{
+    <h2>No Data Available</h2>
 }
 
 <script>
+    // Retrieve data in tabular form
     $(document).ready(function () {
         debugger;
-        // $('#example').DataTable();
 
         $.ajax({
             type: "Get",
             url: "/Employee/EmployeesList",
             success: function (data) {
-                $('#myTable').DataTable({
+                $('#emp-table').DataTable({
                     data: data,
                     columns: [
-                        { data: 'id' },
                         {
-                            data: 'imagePath',
-                            mRender: function (data, type, row) {
-                                return '<img class="rounded-circle" src="/images/' + data + '" width="30px" />';
+                            data: 'profileImage',
+                            render: function (data, type, row) {
+                                return '<img src="/images/' + data + '" width="50" height="50" alt="Image" />';
                             }
                         },
+                        { data: 'id' },
                         { data: 'firstName' },
                         { data: 'lastName' },
-                        { data: 'contactNo' },
                         { data: 'emailId' },
+                        { data: 'contactNo' },
                         { data: 'age' },
                         {
                             data: null,
-                            mRender: function (data, type, row) {
-                                // return '<a href="/Employee/Edit/' + row.id + '" class="btn btn-primary btn-sm">Edit</a> | <a href="/Employee/Delete/' + row.id + '" class="btn btn-danger btn-sm">Delete</a>';
-                                return `<button type="button" class="btn btn-primary" onclick=edit(` + row.id + `) data-bs-toggle="modal" data-bs-target="#AddEmployeeModal">Edit</button>
-                                                |
-                                                <a href="/Employee/Delete/' + row.id + '" class="btn btn-danger btn-sm">Delete</a>`
+                            render: function (data, type, row) {
+                                // return '<a href="/EmployeeManagement/Edit/' + row.id + '">Edit</a> | <a href="/EmployeeManagement/Delete/' + row.id + '">Delete</a>';
+                                return '<button type="button" onclick=populateUpdateModal(' + row.id + ') class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#updateEmployeeModal">Edit</button> | <button type="button" onclick=deleteEmployee(' + row.id + ') class="btn btn-primary">Delete</button>';
                             }
                         }
                     ]
                 });
-                // Success = true; // doesn't go here
+            }
+        });
+    });
+
+    // Function for save anew employee
+
+    function saveEmployee() {
+
+        var formData = new FormData($('#employeeForm')[0]);
+
+        $.ajax({
+            type: "POST",
+            url: "/Employee/Create",
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function (data) {
+                alert("Employee saved successfully!");
+                $('#employeeModal').modal('hide');
+                location.reload();
             },
-            error: function (textStatus, errorThrown) {
-                Success = false; // doesn't go here
+            error: function (error) {
+                console.error("Error saving employee:", error);
+            }
+        });
+    }
+
+    var globEmployeeId;
+
+    // Function to populate form fields by ID
+    function populateUpdateModal(employeeId) {
+        debugger;
+        globEmployeeId = employeeId;
+        $.ajax({
+            type: "GET",
+            url: "/Employee/populateEditData/" + employeeId, // Update URL based on your routing
+            success: function (employee) {
+                // Populate form fields with employee details
+                $('#id_u').val(employee.id);
+                $('#firstName_u').val(employee.firstName);
+                $('#lastName_u').val(employee.lastName);
+                $('#emailId_u').val(employee.emailId);
+                $('#contactNo_u').val(employee.contactNo);
+                $('#age_u').val(employee.age);
+
+                // $('#imageFile').val(employee.profileImage);
+            },
+            error: function (error) {
+                console.error("Error fetching employee details:", error);
             }
         });
 
-        $('#save-form').submit(function (event) {
-            event.preventDefault();
+    }
 
-            var formData = new FormData(this); // Capture form data
+    function updateEmployee() {
+        // Collect form field values into an object
+        var employeeData = {
+            Id: globEmployeeId,
+            FirstName: $('#firstName_u').val(),
+            LastName: $('#lastName_u').val(),
+            EmailId: $('#emailId_u').val(),
+            ContactNo: $('#contactNo_u').val(),
+            Age: $('#age_u').val(),
 
+        };
+
+        debugger;
+
+        $.ajax({
+            type: "POST",
+            url: "/Employee/Edit/",
+            data: JSON.stringify(employeeData), 
+            contentType: "application/json", 
+            dataType: "json",
+            success: function (data) {
+                alert("Employee updated successfully!");
+                $('#updateEmployeeModal').modal('hide');
+                location.reload();
+            },
+            error: function (error) {
+                console.error("Error updating employee:", error);
+            },
+        });
+    }
+
+
+    // Function for delete existing new employee
+    function deleteEmployee(employeeId) {
+        if (confirm("Are you sure you want to delete this employee?")) {
             $.ajax({
-                type: "Post",
-                url: "/Employee/Create",
-                data: formData,
-                processData: false, // Prevent jQuery from automatically processing the data
-                contentType: false, // Set content type to false to prevent jQuery from adding a Content-Type header
-                success: function (response) {
-                    alert("Employee Data Saved Successfully.");
-                    $('AddEmployeeModel').modal('hide');
+                type: "GET", 
+                url: "/Employee/Delete/" + employeeId,
+                success: function (data) {
+                    alert("Employee deleted successfully!");
                     location.reload();
                 },
-                error: function (status, error) {
-                    console.error('Error saving employee data:', error);
+                error: function (error) {
+                    console.error("Error deleting employee:", error);
                 }
-
-            })
-
-        });
-
-    });
+            });
+        }
+    }
 
 </script>
