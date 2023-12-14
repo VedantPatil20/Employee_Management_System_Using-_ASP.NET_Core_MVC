@@ -181,8 +181,6 @@ namespace Employee_Mnagement_System.Controllers
         {
             EmployeeModel employeeModel = null;
 
-            // const string queryString = "SELECT * FROM employee WHERE emp_id = @Id";
-
             const string StoredProcedure = "GetEmployeeById";
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
@@ -215,12 +213,24 @@ namespace Employee_Mnagement_System.Controllers
                 }
             }
 
+            if (employeeModel != null)
+            {
+                IFormFile imageFile = HttpContext.Request.Form.Files["imageFile"];
+
+                if (imageFile != null)
+                {
+                    string uniqueFileName = UploadImage(imageFile);
+                    employeeModel.ProfileImage = uniqueFileName;
+                }
+            }
+
             return Json(employeeModel);
         }
 
         [HttpPost]
         public IActionResult Edit([FromBody] EmployeeModel employee)
         {
+            employee.ProfileImage = UploadImage(employee.imageFile);
 
             try
             {

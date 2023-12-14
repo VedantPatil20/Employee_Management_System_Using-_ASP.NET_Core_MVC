@@ -18,6 +18,8 @@
 
             <form id="employeeForm" autocomplete="off">
 
+                <input id="empId" name="Id" type="number" class="form-control" hidden>
+
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-6">
@@ -58,7 +60,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-success" onclick="saveEmployee()">Save changes</button>
+                    <button type="button" class="btn btn-success" id="changeBtn" onclick="saveEmployee()">Save changes</button>
                 </div>
 
             </form>
@@ -110,12 +112,25 @@
                         </div>
                     </div>
 
-                    <div class="row">
-                        <div class="col-8">
+                    @* <div class="row">
+                        <div class="col-12">
                             <label for="imageFile_u" class="form-label">Profile Image</label>
                             <input id="imageFile_u" name="imageFile" type="file" class="form-control">
                         </div>
+                    </div> *@
+
+                    <div class="row">
+                        <div class="col-12">
+                            <label for="imageFile_u" class="form-label">Profile Image</label>
+                            <!-- Input for displaying the image path -->
+                            <input id="imagePath_u" type="text" class="form-control" readonly>
+                            <!-- Image preview -->
+                            <img id="imagePreview_u" src="#" alt="Preview" style="max-width: 100px; max-height: 100px; margin-top: 5px; display: none;">
+                            <input id="imageFile_u" name="imageFile" type="file" class="form-control">
+                        </div>
                     </div>
+
+
 
                 </div>
                 <div class="modal-footer">
@@ -176,7 +191,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-8">
+                        <div class="col-12">
                             <label for="imageFile_r" class="form-label">Profile Image</label>
                             <input id="imageFile_r" name="imageFile" type="file" class="form-control" disabled>
                         </div>
@@ -257,6 +272,7 @@ else
     });
 
     function viewEmployee(employeeId) {
+
         debugger;
         $.ajax({
             type: "GET",
@@ -282,6 +298,8 @@ else
     function saveEmployee() {
 
         var formData = new FormData($('#employeeForm')[0]);
+
+        debugger;
 
         $.ajax({
             type: "POST",
@@ -315,13 +333,14 @@ else
                 $('#contactNo_u').val(employee.contactNo);
                 $('#age_u').val(employee.age);
 
-                // $('#imageFile').val(employee.profileImage);
+                var imagePath = "/images/" + employee.ProfileImage;
+                $('#imageFile_u').siblings('.form-control').first().val(imagePath); 
+
             },
             error: function (error) {
                 console.error("Error fetching employee details:", error);
             }
         });
-
     }
 
     function updateEmployee() {
@@ -333,6 +352,7 @@ else
             EmailId: $('#emailId_u').val(),
             ContactNo: $('#contactNo_u').val(),
             Age: $('#age_u').val(),
+            imageFile: $('#imageFile_u')[0].files[0]
         };
 
         debugger;
@@ -349,6 +369,7 @@ else
                 location.reload();
             },
             error: function (error) {
+
                 console.error("Error updating employee:", error);
             },
         });
