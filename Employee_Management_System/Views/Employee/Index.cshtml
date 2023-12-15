@@ -16,7 +16,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <form id="employeeForm" autocomplete="off">
+            <form autocomplete="off">
 
                 <input id="empId" name="Id" type="number" class="form-control" hidden>
 
@@ -122,15 +122,11 @@
                     <div class="row">
                         <div class="col-12">
                             <label for="imageFile_u" class="form-label">Profile Image</label>
-                            <!-- Input for displaying the image path -->
-                            <input id="imagePath_u" type="text" class="form-control" readonly>
+                            <input id="imageFile_u" name="imageFile" type="file" class="form-control" onchange="previewImage(this)">
                             <!-- Image preview -->
-                            <img id="imagePreview_u" src="#" alt="Preview" style="max-width: 100px; max-height: 100px; margin-top: 5px; display: none;">
-                            <input id="imageFile_u" name="imageFile" type="file" class="form-control">
+                            <img id="imagePreview_u" src="#" alt="Image Preview" style="max-width: 100%; max-height: 150px; margin-top: 10px; display: none;">
                         </div>
                     </div>
-
-
 
                 </div>
                 <div class="modal-footer">
@@ -210,35 +206,38 @@
 
 <h3 class="text-decoration-underline">@ViewData["title"]</h3>
 
-@if (Model.Any())
-{
-    <table class="table" id="emp-table">
-        <thead>
-            <tr>
-                <th>Profile</th>
-                <th>Employee Id</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Contact No</th>
-                <th>Email Id</th>
-                <th>Age</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @* Use AJAX for displaying data *@
-        </tbody>
-    </table>
-}
-else
-{
-    <h2>No Data Available</h2>
-}
+<table class="table" id="emp-table">
+    <thead>
+        <tr>
+            <th>Profile</th>
+            <th>Employee Id</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Contact No</th>
+            <th>Email Id</th>
+            <th>Age</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @* Use AJAX for displaying data *@
+    </tbody>
+</table>
 
 <script>
     // Retrieve data in tabular form
     $(document).ready(function () {
         debugger;
+
+        get();
+    });
+
+    function get() {
+
+        // Destroy the existing DataTable
+        if ($.fn.DataTable.isDataTable('#emp-table')) {
+            $('#emp-table').DataTable().destroy();
+        }
 
         $.ajax({
             type: "Get",
@@ -269,35 +268,25 @@ else
                 });
             }
         });
-    });
 
-    function viewEmployee(employeeId) {
-
-        debugger;
-        $.ajax({
-            type: "GET",
-            url: "/Employee/GetEmployeeById/" + employeeId, // Update URL based on your routing
-            success: function (employee) {
-                // Populate form fields with employee details
-                $('#empId_r').val(employee.id);
-                $('#firstName_r').val(employee.firstName);
-                $('#lastName_r').val(employee.lastName);
-                $('#emailId_r').val(employee.emailId);
-                $('#contactNo_r').val(employee.contactNo);
-                $('#age_r').val(employee.age);
-
-                // $('#imageFile').val(employee.profileImage);
-            },
-            error: function (error) {
-                console.error("Error fetching employee details:", error);
-            }
-        });
     }
 
     // Function for save anew employee
     function saveEmployee() {
 
-        var formData = new FormData($('#employeeForm')[0]);
+        var employeeData = {
+            FirstName: $('#firstName').val(),
+            LastName: $('#lastName').val(),
+            EmailId: $('#emailId').val(),
+            ContactNo: $('#contactNo').val(),
+            Age: $('#age').val(),
+        }
+
+        debugger;
+
+        var formData = new FormData();
+        formData.append("model", JSON.stringify(employeeData));
+        formData.append("file", $("#imageFile")[0].files[0]);
 
         debugger;
 
@@ -307,10 +296,20 @@ else
             data: formData,
             contentType: false,
             processData: false,
+            Cache: false,
             success: function (data) {
-                alert("Employee saved successfully!");
-                $('#employeeModal').modal('hide');
-                location.reload();
+                console.log("Employee saved successfully!");
+                $('#saveEmployeeModal').modal('hide');
+
+                // Clear the form fields
+                $('#firstName').val('');
+                $('#lastName').val('');
+                $('#emailId').val('');
+                $('#contactNo').val('');
+                $('#age').val('');
+                $('#imageFile').val('');
+
+                get();
             },
             error: function (error) {
                 console.error("Error saving employee:", error);
@@ -323,8 +322,9 @@ else
         debugger;
         $.ajax({
             type: "GET",
-            url: "/Employee/populateEditData/" + employeeId, // Update URL based on your routing
+            url: "/Employee/populateEditData/" + employeeId, // Update URL based on routing
             success: function (employee) {
+
                 // Populate form fields with employee details
                 $('#empId_u').val(employee.id);
                 $('#firstName_u').val(employee.firstName);
@@ -333,43 +333,59 @@ else
                 $('#contactNo_u').val(employee.contactNo);
                 $('#age_u').val(employee.age);
 
-                var imagePath = "/images/" + employee.ProfileImage;
-                $('#imageFile_u').siblings('.form-control').first().val(imagePath); 
+                var imagePreview = employee.profileImage
+                    ? '/images/' + employee.profileImage
+                    : 'Upload Image';
+                $('#imagePreview_u').attr('src', imagePreview).show();
 
             },
             error: function (error) {
                 console.error("Error fetching employee details:", error);
             }
         });
+
     }
 
+
     function updateEmployee() {
+
         // Collect form field values into an object
+
+        var employeeId = {
+            Id: $('#empId_u').val()
+        }
+
         var employeeData = {
-            Id: $('#empId_u').val(),
             FirstName: $('#firstName_u').val(),
             LastName: $('#lastName_u').val(),
             EmailId: $('#emailId_u').val(),
             ContactNo: $('#contactNo_u').val(),
-            Age: $('#age_u').val(),
-            imageFile: $('#imageFile_u')[0].files[0]
+            Age: $('#age_u').val()
         };
+
+        debugger;
+
+        var formData = new FormData();
+        formData.append("Id", employeeId.Id);
+        formData.append("model", JSON.stringify(employeeData));
+        formData.append("file", $("#imageFile_u")[0].files[0]);
 
         debugger;
 
         $.ajax({
             type: "POST",
-            url: "/Employee/Edit/",
-            data: JSON.stringify(employeeData),
-            contentType: "application/json",
-            dataType: "json",
+            url: "/Employee/Edit",
+            data: formData,
+            contentType: false,
+            processData: false,
+            Cache: false,
             success: function (data) {
                 alert("Employee updated successfully!");
                 $('#updateEmployeeModal').modal('hide');
-                location.reload();
+
+                get();
             },
             error: function (error) {
-
                 console.error("Error updating employee:", error);
             },
         });
@@ -384,12 +400,30 @@ else
                 url: "/Employee/Delete/" + employeeId,
                 success: function (data) {
                     alert("Employee deleted successfully!");
-                    location.reload();
+
+                    get();
                 },
                 error: function (error) {
                     console.error("Error deleting employee:", error);
                 }
             });
+        }
+    }
+
+    function previewImage(input) {
+        var file = input.files[0];
+
+        if (file) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('#imagePreview_u').attr('src', e.target.result).show();
+            };
+
+            reader.readAsDataURL(file);
+        } else {
+            // Clear the image preview if no file is selected
+            $('#imagePreview_u').attr('src', '').hide();
         }
     }
 

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using System.Data;
+using System.Text.Json;
 
 namespace Employee_Mnagement_System.Controllers
 {
@@ -42,7 +43,7 @@ namespace Employee_Mnagement_System.Controllers
                         employee.LastName = reader["last_name"].ToString();
                         employee.EmailId = reader["email_id"].ToString();
                         employee.ContactNo = reader["contact_no"].ToString();
-                        employee.Age = (int)reader["emp_age"];
+                        employee.Age = reader["emp_age"].ToString();
                         employee.ProfileImage = reader["profile_image"].ToString();
 
                         employeeList.Add(employee);
@@ -79,7 +80,7 @@ namespace Employee_Mnagement_System.Controllers
                         employee.LastName = reader["last_name"].ToString();
                         employee.EmailId = reader["email_id"].ToString();
                         employee.ContactNo = reader["contact_no"].ToString();
-                        employee.Age = (int)reader["emp_age"];
+                        employee.Age = reader["emp_age"].ToString();
                         employee.ProfileImage = reader["profile_image"].ToString();
 
                         employeeList.Add(employee);
@@ -124,7 +125,7 @@ namespace Employee_Mnagement_System.Controllers
                             employeeModel.LastName = reader["last_name"].ToString();
                             employeeModel.EmailId = reader["email_id"].ToString();
                             employeeModel.ContactNo = reader["contact_no"].ToString();
-                            employeeModel.Age = (int)reader["emp_age"];
+                            employeeModel.Age = reader["emp_age"].ToString();
                             employeeModel.ProfileImage = reader["profile_image"].ToString();
                         }
                     }
@@ -146,14 +147,18 @@ namespace Employee_Mnagement_System.Controllers
             return View();
         }
 
-        [HttpPost]
-        public IActionResult Create(EmployeeModel employee)
+        [HttpPost, RequestSizeLimit(25 * 1000 * 1024)]
+        public IActionResult Create(string model, IFormFile file)
         {
+
+            EmployeeModel employee = JsonSerializer.Deserialize<EmployeeModel>(model)!;
+
+            employee.imageFile = file;
+
             employee.ProfileImage = UploadImage(employee.imageFile);
 
             using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                // const string Query = "Insert into employee (first_name, last_name, email_id, contact_no, emp_age, profile_image) values (@FirstName, @LastName, @EmailId, @ContactNo, @Age, @ProfileImage);";
 
                 const string StoredProcedure = "InsertEmployee";
 
@@ -206,34 +211,76 @@ namespace Employee_Mnagement_System.Controllers
                         employeeModel.LastName = reader["last_name"].ToString();
                         employeeModel.EmailId = reader["email_id"].ToString();
                         employeeModel.ContactNo = reader["contact_no"].ToString();
-                        employeeModel.Age = (int)reader["emp_age"];
+                        employeeModel.Age = reader["emp_age"].ToString();
                         employeeModel.ProfileImage = reader["profile_image"].ToString();
 
                     }
                 }
             }
 
-            if (employeeModel != null)
-            {
-                IFormFile imageFile = HttpContext.Request.Form.Files["imageFile"];
-
-                if (imageFile != null)
-                {
-                    string uniqueFileName = UploadImage(imageFile);
-                    employeeModel.ProfileImage = uniqueFileName;
-                }
-            }
-
             return Json(employeeModel);
         }
 
-        [HttpPost]
-        public IActionResult Edit([FromBody] EmployeeModel employee)
+        [HttpPost, RequestSizeLimit(25 * 1000 * 1024)]
+        public IActionResult Edit(int id, string model, IFormFile file)
         {
-            employee.ProfileImage = UploadImage(employee.imageFile);
+
+            EmployeeModel employee = JsonSerializer.Deserialize<EmployeeModel>(model)!;
+
+            employee.Id = id;
+
+            employee.imageFile = file;
+
+            // employee.ProfileImage = UploadImage(employee.imageFile);
 
             try
             {
+                // Get existing profile image from the database
+                string existingImage = null;
+
+                using (MySqlConnection connection = new MySqlConnection(connectionString))
+                {
+                    string StoredProcedure = "GetProfileImageById";
+
+                    using (MySqlCommand command = new MySqlCommand(StoredProcedure, connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@Id", employee.Id);
+
+                        connection.Open();
+
+                        using (var reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                existingImage = reader["profile_image"].ToString();
+                            }
+                        }
+                    }
+                }
+
+                // If a new image file is uploaded, update the profile image
+                if (employee.imageFile != null)
+                {
+                    // Delete the old image file if it exists
+                    if (!string.IsNullOrEmpty(existingImage))
+                    {
+                        string oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", existingImage);
+
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
+
+                    employee.ProfileImage = UploadImage(employee.imageFile);
+                }
+                else
+                {
+                    // If no new image is provided, use the existing image
+                    employee.ProfileImage = existingImage;
+                }
+
                 using (MySqlConnection connection = new MySqlConnection(connectionString))
                 {
                     string StoredProcedure = "UpdateEmployee";
@@ -360,7 +407,7 @@ namespace Employee_Mnagement_System.Controllers
                         employee.LastName = reader["last_name"].ToString();
                         employee.EmailId = reader["email_id"].ToString();
                         employee.ContactNo = reader["contact_no"].ToString();
-                        employee.Age = (int)reader["emp_age"];
+                        employee.Age = reader["emp_age"].ToString();
 
                         employeeList.Add(employee);
                     }
