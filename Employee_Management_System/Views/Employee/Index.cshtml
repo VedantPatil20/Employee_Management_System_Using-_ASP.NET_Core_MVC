@@ -186,10 +186,19 @@
                         </div>
                     </div>
 
-                    <div class="row">
+                    @* <div class="row">
                         <div class="col-12">
                             <label for="imageFile_r" class="form-label">Profile Image</label>
                             <input id="imageFile_r" name="imageFile" type="file" class="form-control" disabled>
+                        </div>
+                    </div> *@
+
+                    <div class="row">
+                        <div class="col-12">
+                            <label for="imageFile_r" class="form-label">Profile Image</label>
+                            <input id="imageFile_r" name="imageFile" type="file" class="form-control" onchange="previewImage(this)" hidden><br />
+                            <!-- Image preview -->
+                            <img id="imagePreview_r" src="#" alt="Image Preview" style="max-width: 100%; max-height: 150px; margin-top: 10px; display: none;">
                         </div>
                     </div>
 
@@ -266,6 +275,35 @@
                         }
                     ]
                 });
+            }
+        });
+
+    }
+
+    // Function for view employee by their ID
+    function viewEmployee(employeeId) {
+        debugger;
+        $.ajax({
+            type: "GET",
+            url: "/Employee/GetEmployeeById/" + employeeId, // Update URL based on routing
+            success: function (employee) {
+
+                // Populate form fields with employee details
+                $('#empId_r').val(employee.id);
+                $('#firstName_r').val(employee.firstName);
+                $('#lastName_r').val(employee.lastName);
+                $('#emailId_r').val(employee.emailId);
+                $('#contactNo_r').val(employee.contactNo);
+                $('#age_r').val(employee.age);
+
+                var imagePreview = employee.profileImage
+                    ? '/images/' + employee.profileImage
+                    : 'Upload Image';
+                $('#imagePreview_r').attr('src', imagePreview).show();
+
+            },
+            error: function (error) {
+                console.error("Error fetching employee details:", error);
             }
         });
 
@@ -354,6 +392,8 @@
         var employeeId = {
             Id: $('#empId_u').val()
         }
+
+        debugger;
 
         var employeeData = {
             FirstName: $('#firstName_u').val(),
