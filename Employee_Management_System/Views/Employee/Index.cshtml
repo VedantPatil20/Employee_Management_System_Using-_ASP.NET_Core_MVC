@@ -4,146 +4,19 @@
     ViewData["title"] = "Employee Details";
 }
 
-<!-- Button trigger modal for Save Data -->
-<button type="button" class="btn btn-primary my-2" data-bs-toggle="modal" data-bs-target="#saveEmployeeModal">Add New Employee</button>
+<div class="container-fluid d-flex justify-content-between mt-2">
+    <div class="fs-3 fw-bold">Employee Details</div>
+
+    <!-- Button trigger modal for Save Data -->
+    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#employeeModal" onclick="openEmployeeModal('save', null)">Add New Employee</button>
+</div>
 
 <!-- Modal for Save Data -->
-<div class="modal fade" id="saveEmployeeModal" tabindex="-1" aria-labelledby="saveEmployeeModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<div class="modal fade" id="employeeModal" tabindex="-1" aria-labelledby="employeeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="saveEmployeeModalLabel">Add New Employee</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-
-            <form autocomplete="off">
-
-                <input id="empId" name="Id" type="number" class="form-control" hidden>
-
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="firstName" class="form-label">First Name</label>
-                            <input id="firstName" name="FirstName" type="text" class="form-control">
-                        </div>
-                        <div class="col-6">
-                            <label for="lastName" class="form-label">Last Name</label>
-                            <input id="lastName" name="LastName" type="text" class="form-control">
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-12">
-                            <label for="emailId" class="form-label">Email</label>
-                            <input id="emailId" name="EmailId" type="text" class="form-control">
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-8">
-                            <label for="contactNo" class="form-label">Contact No.</label>
-                            <input id="contactNo" name="ContactNo" type="text" class="form-control">
-                        </div>
-                        <div class="col-4">
-                            <label for="age" class="form-label">Age</label>
-                            <input id="age" name="Age" type="text" class="form-control">
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-8">
-                            <label for="imageFile" class="form-label">Profile Image</label>
-                            <input id="imageFile" name="imageFile" type="file" class="form-control">
-                        </div>
-                    </div>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-success" id="changeBtn" onclick="saveEmployee()">Save changes</button>
-                </div>
-
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Modal for Update Data -->
-<div class="modal fade" id="updateEmployeeModal" tabindex="-1" aria-labelledby="updateEmployeeModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="updateEmployeeModalLabel">Update Employee</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-
-            <form id="updateForm" autocomplete="off">
-
-                <div class="modal-body">
-
-                    <input id="empId_u" name="Id" type="number" class="form-control" hidden>
-
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="firstName_u" class="form-label">First Name</label>
-                            <input id="firstName_u" name="FirstName" type="text" class="form-control">
-                        </div>
-                        <div class="col-6">
-                            <label for="lastName_u" class="form-label">Last Name</label>
-                            <input id="lastName_u" name="LastName" type="text" class="form-control">
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-12">
-                            <label for="emailId_u" class="form-label">Email</label>
-                            <input id="emailId_u" name="EmailId" type="text" class="form-control">
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-8">
-                            <label for="contactNo_u" class="form-label">Contact No.</label>
-                            <input id="contactNo_u" name="ContactNo" type="text" class="form-control">
-                        </div>
-                        <div class="col-4">
-                            <label for="age_u" class="form-label">Age</label>
-                            <input id="age_u" name="Age" type="text" class="form-control">
-                        </div>
-                    </div>
-
-                    @* <div class="row">
-                        <div class="col-12">
-                            <label for="imageFile_u" class="form-label">Profile Image</label>
-                            <input id="imageFile_u" name="imageFile" type="file" class="form-control">
-                        </div>
-                    </div> *@
-
-                    <div class="row">
-                        <div class="col-12">
-                            <label for="imageFile_u" class="form-label">Profile Image</label>
-                            <input id="imageFile_u" name="imageFile" type="file" class="form-control" onchange="previewImage(this)">
-                            <!-- Image preview -->
-                            <img id="imagePreview_u" src="#" alt="Image Preview" style="max-width: 100%; max-height: 150px; margin-top: 10px; display: none;">
-                        </div>
-                    </div>
-
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-success" onclick="updateEmployee()">Update changes</button>
-                </div>
-
-            </form>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="viewEmployeeModal" tabindex="-1" aria-labelledby="viewEmployeeModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="viewEmployeeModalLabel">Employee Details</h5>
+                <h5 class="modal-title" id="employeeModalLabel">Add New Employee</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
@@ -151,96 +24,128 @@
                 <div class="modal-body">
 
                     <div class="row">
-                        <div class="col-12">
-                            <label for="empId_r" class="form-label">Employee Id</label>
-                            <input id="empId_r" name="Id" type="number" class="form-control" readonly>
-                        </div>
-                    </div>
+                        <div class="col-5">
+                            <div class="row">
+                                <div class="col-12">
+                                    @* <label for="imageFile" class="form-label">Profile Image</label> *@
 
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="firstName_r" class="form-label">First Name</label>
-                            <input id="firstName_r" name="FirstName" type="text" class="form-control" readonly>
-                        </div>
-                        <div class="col-6">
-                            <label for="lastName_r" class="form-label">Last Name</label>
-                            <input id="lastName_r" name="LastName" type="text" class="form-control" readonly>
-                        </div>
-                    </div>
+                                    <div class="mx-auto" style="height: 225px; width: 225px;">
+                                        <!-- Image preview -->
+                                        <img id="imagePreview" src="images/profile.png" alt="Image Preview" style="height:100%; border-radius: 50%;">
+                                    </div>
 
-                    <div class="row">
-                        <div class="col-12">
-                            <label for="emailId_r" class="form-label">Email</label>
-                            <input id="emailId_r" name="EmailId" type="text" class="form-control" readonly>
-                        </div>
-                    </div>
+                                    <div class="mt-2">
+                                        <!-- Add new Profile Image -->
+                                        <button id="add-profile" type="button" class="btn btn-outline-success w-100" onclick="AddProfile()">Add Profile Image</button>
+                                        <input id="imageFile" name="imageFile" type="file" class="form-control visually-hidden" onchange="previewImage(this)">
 
-                    <div class="row">
-                        <div class="col-8">
-                            <label for="contactNo_r" class="form-label">Contact No.</label>
-                            <input id="contactNo_r" name="ContactNo" type="text" class="form-control" readonly>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <!-- Change profile image -->
+                                                <button type="button" id="change-profile" class="btn btn-outline-warning w-100" onclick="ChangeProfile()" style="display: none;">Change</button>
+                                            </div>
+                                            <div class="col-6">
+                                                <!-- Remove Profile Image -->
+                                                <button type="button" id="remove-profile" class="btn btn-outline-danger w-100" onclick="RemoveProfile()" style="display: none;">Remove</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-4">
-                            <label for="age_r" class="form-label">Age</label>
-                            <input id="age_r" name="Age" type="text" class="form-control" readonly>
-                        </div>
-                    </div>
 
-                    @* <div class="row">
-                        <div class="col-12">
-                            <label for="imageFile_r" class="form-label">Profile Image</label>
-                            <input id="imageFile_r" name="imageFile" type="file" class="form-control" disabled>
-                        </div>
-                    </div> *@
+                        <div class="col-7">
 
-                    <div class="row">
-                        <div class="col-12">
-                            <label for="imageFile_r" class="form-label">Profile Image</label>
-                            <input id="imageFile_r" name="imageFile" type="file" class="form-control" onchange="previewImage(this)" hidden><br />
-                            <!-- Image preview -->
-                            <img id="imagePreview_r" src="#" alt="Image Preview" style="max-width: 100%; max-height: 150px; margin-top: 10px; display: none;">
+                            <div class="row">
+                                <div class="col-12">
+                                    <input id="empId" name="Id" type="number" class="form-control" autocomplete="off" hidden>
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="col-12">
+                                    <label for="firstName" class="form-label">First Name</label>
+                                    <input id="firstName" name="FirstName" type="text" class="form-control" autocomplete="off" onblur="formValidation()">
+                                    <span id="firstNameError" style="color: red; display: none;"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="col-12">
+                                    <label for="lastName" class="form-label">Last Name</label>
+                                    <input id="lastName" name="LastName" type="text" class="form-control" autocomplete="off">
+                                    <span id="lastNameError" style="color: red; display: none;"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="col-12">
+                                    <label for="emailId" class="form-label">Email</label>
+                                    <input id="emailId" name="EmailId" type="text" class="form-control" autocomplete="off">
+                                    <span id="emailIdError" style="color: red; display: none;"></span>
+                                </div>
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="col-8">
+                                    <label for="contactNo" class="form-label">Contact No.</label>
+                                    <input id="contactNo" name="ContactNo" type="text" class="form-control" autocomplete="off">
+                                    <span id="contactNoError" style="color: red; display: none;"></span>
+                                </div>
+                                <div class="col-4">
+                                    <label for="age" class="form-label">Age</label>
+                                    <input id="age" name="Age" type="text" class="form-control" autocomplete="off">
+                                    <span id="ageError" style="color: red; display: none;"></span>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
 
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="saveEmployeeButton" type="button" class="btn btn-success" onclick="saveEmployee()">Save changes</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<hr />
+<hr/>
 
-<h3 class="text-decoration-underline">@ViewData["title"]</h3>
+@if (Model.Any())
+{
+    <table id="emp-table" class="table table-responsive hover order-column" style="width:100%">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Profile</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Contact No</th>
+                <th>Email Id</th>
+                <th>Age</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
 
-<table class="table" id="emp-table">
-    <thead>
-        <tr>
-            <th>Profile</th>
-            <th>Employee Id</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Contact No</th>
-            <th>Email Id</th>
-            <th>Age</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @* Use AJAX for displaying data *@
-    </tbody>
-</table>
+    </table>
+}
+else
+{
+    <h2>No Data Available</h2>
+}
 
+@* JavaScript and Ajax *@
 <script>
-    // Retrieve data in tabular form
+
     $(document).ready(function () {
         debugger;
-
         get();
     });
 
+    @* display table body *@
     function get() {
 
         // Destroy the existing DataTable
@@ -249,19 +154,19 @@
         }
 
         $.ajax({
-            type: "Get",
+            type: "GET",
             url: "/Employee/EmployeesList",
             success: function (data) {
                 $('#emp-table').DataTable({
                     data: data,
                     columns: [
+                        { data: 'id' },
                         {
                             data: 'profileImage',
                             render: function (data, type, row) {
-                                return '<img class="rounded-circle" src="/images/' + data + '" width="25" height="25" alt="Image"/>';
+                                return '<img src="/images/' + data + '" width="25" height="25" alt="Image" />';
                             }
                         },
-                        { data: 'id' },
                         { data: 'firstName' },
                         { data: 'lastName' },
                         { data: 'emailId' },
@@ -270,14 +175,13 @@
                         {
                             data: null,
                             render: function (data, type, row) {
-                                return '<button type="button" onclick=viewEmployee(' + row.id + ') class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewEmployeeModal">Details</button> | <button type="button" onclick=populateUpdateModal(' + row.id + ') class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#updateEmployeeModal">Edit</button> | <button type="button" onclick=deleteEmployee(' + row.id + ') class="btn btn-danger btn-sm">Delete</button>';
+                                    return '<button type="button" onclick="openEmployeeModal(\'view\', ' + row.id + ')" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#employeeModal">Details</button> | <button type="button" onclick="openEmployeeModal(\'edit\', ' + row.id + ')" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#employeeModal">Edit</button> | <button type="button" onclick="deleteEmployee(' + row.id + ')" class="btn btn-primary btn-sm">Delete</button>';
                             }
                         }
                     ]
                 });
             }
         });
-
     }
 
     // Function for view employee by their ID
@@ -289,17 +193,17 @@
             success: function (employee) {
 
                 // Populate form fields with employee details
-                $('#empId_r').val(employee.id);
-                $('#firstName_r').val(employee.firstName);
-                $('#lastName_r').val(employee.lastName);
-                $('#emailId_r').val(employee.emailId);
-                $('#contactNo_r').val(employee.contactNo);
-                $('#age_r').val(employee.age);
+                $('#empId').val(employee.id);
+                $('#firstName').val(employee.firstName);
+                $('#lastName').val(employee.lastName);
+                $('#emailId').val(employee.emailId);
+                $('#contactNo').val(employee.contactNo);
+                $('#age').val(employee.age);
 
                 var imagePreview = employee.profileImage
                     ? '/images/' + employee.profileImage
                     : 'Upload Image';
-                $('#imagePreview_r').attr('src', imagePreview).show();
+                $('#imagePreview').attr('src', imagePreview).show();
 
             },
             error: function (error) {
@@ -319,13 +223,9 @@
             Age: $('#age').val(),
         }
 
-        debugger;
-
         var formData = new FormData();
         formData.append("model", JSON.stringify(employeeData));
         formData.append("file", $("#imageFile")[0].files[0]);
-
-        debugger;
 
         $.ajax({
             type: "POST",
@@ -335,46 +235,50 @@
             processData: false,
             Cache: false,
             success: function (data) {
-                console.log("Employee saved successfully!");
-                $('#saveEmployeeModal').modal('hide');
 
-                // Clear the form fields
-                $('#firstName').val('');
-                $('#lastName').val('');
-                $('#emailId').val('');
-                $('#contactNo').val('');
-                $('#age').val('');
-                $('#imageFile').val('');
+                swal({
+                    title: "Good job!",
+                    text: "Employee saved successfully!",
+                    icon: "success",
+                    button: "Ok",
+                });
 
+                clearForm();
+
+                $('#employeeModal').modal('hide');
+                
+                // Reload the DataTable
                 get();
+
             },
             error: function (error) {
-                console.error("Error saving employee:", error);
+                swal("Oops", "Error saving employee:", error, "error")
             }
         });
     }
 
-    // Function to populate form fields by ID for Update Data
+    // Function for update employee
+    // Function to populate form fields by ID
     function populateUpdateModal(employeeId) {
         debugger;
         $.ajax({
             type: "GET",
-            url: "/Employee/populateEditData/" + employeeId, // Update URL based on routing
+            url: "/Employee/populateEditData/" + employeeId, // Update URL based on your routing
             success: function (employee) {
 
                 // Populate form fields with employee details
-                $('#empId_u').val(employee.id);
-                $('#firstName_u').val(employee.firstName);
-                $('#lastName_u').val(employee.lastName);
-                $('#emailId_u').val(employee.emailId);
-                $('#contactNo_u').val(employee.contactNo);
-                $('#age_u').val(employee.age);
+                $('#empId').val(employee.id);
+                $('#firstName').val(employee.firstName);
+                $('#lastName').val(employee.lastName);
+                $('#emailId').val(employee.emailId);
+                $('#contactNo').val(employee.contactNo);
+                $('#age').val(employee.age);
 
                 var imagePreview = employee.profileImage
                     ? '/images/' + employee.profileImage
                     : 'Upload Image';
-                $('#imagePreview_u').attr('src', imagePreview).show();
-
+                $('#imagePreview').attr('src', imagePreview).show();
+                
             },
             error: function (error) {
                 console.error("Error fetching employee details:", error);
@@ -383,23 +287,20 @@
 
     }
 
-
+    // Function for update employee
     function updateEmployee() {
-
-        // Collect form field values into an object
-
         var employeeId = {
-            Id: $('#empId_u').val()
-        }
+            Id: $('#empId').val()
+        };
 
         debugger;
 
         var employeeData = {
-            FirstName: $('#firstName_u').val(),
-            LastName: $('#lastName_u').val(),
-            EmailId: $('#emailId_u').val(),
-            ContactNo: $('#contactNo_u').val(),
-            Age: $('#age_u').val()
+            FirstName: $('#firstName').val(),
+            LastName: $('#lastName').val(),
+            EmailId: $('#emailId').val(),
+            ContactNo: $('#contactNo').val(),
+            Age: $('#age').val(),
         };
 
         debugger;
@@ -407,7 +308,7 @@
         var formData = new FormData();
         formData.append("Id", employeeId.Id);
         formData.append("model", JSON.stringify(employeeData));
-        formData.append("file", $("#imageFile_u")[0].files[0]);
+        formData.append("file", $("#imageFile")[0].files[0]);
 
         debugger;
 
@@ -417,38 +318,140 @@
             data: formData,
             contentType: false,
             processData: false,
-            Cache: false,
             success: function (data) {
-                alert("Employee updated successfully!");
-                $('#updateEmployeeModal').modal('hide');
+                // Assuming the controller returns a JSON result, check for success or error
+                if (data === "Index") {
 
-                get();
+                    swal({
+                        title: "Good job!",
+                        text: "Employee details updated successfully!",
+                        icon: "success",
+                        button: "Ok",
+                    });
+
+                    $('#employeeModal').modal('hide');
+                    
+                    get();
+
+                } else {
+                    // Handle errors or show appropriate messages
+                    console.error("Error updating employee:", data);
+                    swal("Oops", "Failed to update employee.Please check the console for details.", "error");
+                }
             },
             error: function (error) {
                 console.error("Error updating employee:", error);
+                swal("Oops", "Failed to update employee.Please check the console for details.", "error");
             },
         });
     }
 
-
     // Function for delete existing new employee
     function deleteEmployee(employeeId) {
-        if (confirm("Are you sure you want to delete this employee?")) {
-            $.ajax({
-                type: "GET",
-                url: "/Employee/Delete/" + employeeId,
-                success: function (data) {
-                    alert("Employee deleted successfully!");
-
-                    get();
-                },
-                error: function (error) {
-                    console.error("Error deleting employee:", error);
+        // Using SweetAlert instead of the standard confirm dialog
+        swal({
+            title: "Are you sure?",
+            text: "Once deleted, you will not be able to recover this employee!",
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                    // Proceed with the deletion
+                    $.ajax({
+                        type: "POST",
+                        url: "/Employee/Delete/" + employeeId,
+                        success: function (data) {
+                            swal("Employee deleted successfully!", {
+                                icon: "success",
+                            }).then(() => {
+                                get(); // Refresh data after deletion
+                            });
+                        },
+                        error: function (error) {
+                            console.error("Error deleting employee:", error);
+                            swal("Error", "Failed to delete employee. Please check the console for details.", "error");
+                        }
+                    });
+                } else {
+                    // User clicked Cancel or closed the dialog
+                    swal("Cancelled", "Your employee is safe!", "info");
                 }
             });
-        }
     }
 
+    // Function to Reset all input fields in the form
+    function clearForm() {
+        // Clear form fields here
+        $('#empId').val('');
+        $('#firstName').val('');
+        $('#lastName').val('');
+        $('#emailId').val('');
+        $('#contactNo').val('');
+        $('#age').val('');
+        $('#imageFile').val('');
+        $('#imagePreview').attr('src', 'images/profile.png').hide();
+        showButtons(false);
+    }
+
+    // Function to open the employee modal based on action ('save' or 'edit')
+    function openEmployeeModal(action, employeeId) {
+
+        if (action === 'save') {
+
+            // Set modal title for 'save' action
+            $('#employeeModalLabel').text('Addd New Employee');
+
+            // Clear form fields when opening for 'save' action
+            clearForm();
+
+            // Set default image for 'save' action
+            $('#imagePreview').attr('src', 'images/profile.png').show();
+            showButtons(false);
+
+            // Set onclick event for the Save button
+            $('#saveEmployeeButton')
+                .attr('onclick', 'saveEmployee()')
+                .text('Save Changes');
+
+        } else if (action === 'edit') {
+
+            // Set modal title for 'edit' action
+            $('#employeeModalLabel').text('Update Employee');
+
+            // Populate the update modal with existing employee data
+            populateUpdateModal(employeeId);
+
+            // Set the image source and show/hide buttons
+            showButtons(true);
+
+            // Set onclick event for the Save button
+            $('#saveEmployeeButton')
+                .attr('onclick', 'updateEmployee()')
+                .text('Update Changes');
+
+        } else {
+            // Set modal title for 'edit' action
+            $('#employeeModalLabel').text('Employee Details');
+
+            // Populate the form with existing employee data
+            viewEmployee(employeeId);
+
+            // Hide or show buttons specific to the 'view' action
+            $('#add-profile').hide();
+            $('#change-profile').hide();
+            $('#remove-profile').hide();
+            $('#saveEmployeeButton').hide();
+
+            $('#empId').show();
+        }
+
+        // Open the modal
+        $('#employeeModal').modal('show');
+    }
+
+    // Function to preview image in modal
     function previewImage(input) {
         var file = input.files[0];
 
@@ -456,13 +459,122 @@
             var reader = new FileReader();
 
             reader.onload = function (e) {
-                $('#imagePreview_u').attr('src', e.target.result).show();
+                $('#imagePreview').attr('src', e.target.result).show();
+                showButtons(true);
             };
 
             reader.readAsDataURL(file);
+        }
+    }
+
+    @* Function to add new the profile image *@
+    function AddProfile() {
+        $('#imageFile').click();
+    }
+
+    @* Function to change the profile image *@
+    function ChangeProfile() {
+        $('#imageFile').click();
+    }
+
+    @* Function to remove the profile image and reset form fields *@
+    function RemoveProfile() {
+
+        @* Reset profile image *@
+        $('#imagePreview').attr('src', 'images/profile.png');
+
+        @* clear image file input field *@
+        $('imageFile').val('');
+
+        @* hide corresponding buttons *@
+        showButtons(false);
+    }
+
+    @* Function to show/hide profile image action buttons based on whether an image is present *@
+    function showButtons(hasImage) {
+
+        @* Show/hide profile image action buttons *@
+        $('#add-profile').css('display', hasImage ? 'none' : 'block');
+        $('#change-profile').css('display', hasImage ? 'block' : 'none');
+        $('#remove-profile').css('display', hasImage ? 'block' : 'none');
+    }
+
+    // Validate form with required and regular expression
+    function formValidation() {
+        // Fetches the value entered in the input field values and removes any leading/trailing whitespace
+        var firstName = $('#firstName').val().trim();
+        var lastName = $('#lastName').val().trim();
+        var emailId = $('#emailId').val().trim();
+        var contactNo = $('#contactNo').val().trim();
+        var age = $('#age').val().trim();
+
+        // Selects the DOM element representing the input field using its ID's
+        var firstNameInput = $('#firstName');
+        var lastNameInput = $('#lastName');
+        var emailIdInput = $('#emailId');
+        var contactNoInput = $('#contactNo');
+        var ageInput = $('#age');
+
+        // Error label ID's for displaying error message
+        var firstNameErrorLabel = $('#firstNameError');
+        var lastNameErrorLabel = $('#lastNameError');
+        var emailIdErrorLabel = $('#emailIdError');
+        var contactNoErrorLabel = $('#contactNoError');
+        var ageErrorLabel = $('#ageError');
+
+        // Regular expression
+        var firstNameRegex = /^[A-Za-z]+$/; // Regex for First Name
+        var lastNameRegex = /^[A-Za-z]+$/; // Regex for last Name
+        var emailIdRegex = /^$/;
+        var contactNoRegex = /^$/;
+        var ageRegex = /^(?:100|[1-9][0-9]?)+$/; // Regex for age
+
+        validateField(firstName, firstNameInput, firstNameErrorLabel, firstNameRegex, 'First Name is required', 'Please enter a valid First Name with text only');
+        validateField(lastName, lastNameInput, lastNameErrorLabel, lastNameRegex, 'Last Name is required', 'Please enter a valid First Name with text only');
+        validateField(emailId, emailIdInput, emailIdErrorLabel, emailIdRegex, 'Email ID is required', 'Please enter a valid Email Address');
+        validateField(contactNo, contactNoInput, contactNoErrorLabel, contactNoRegex, 'Contact Number is required', 'Please enter a valid Contact Number');
+        validateField(age, ageInput, ageErrorLabel, ageRegex, 'Age is required', 'Please enter a valid Age');
+    }
+
+    function validateFirstName() {
+        if (firstName === '') {
+            // Input is empty, show red border and error message
+            firstNameInput.addClass('border border-danger');
+            firstNameErrorLabel.text('First Name is required.');
+            firstNameErrorLabel.show(); // Show the error message
+            $('#saveEmployeeButton').prop('disabled', true); // Disable the button
+        } else if (!fieldRegex.test(fieldValue)) {
+            // Input doesn't match the regex pattern, show red border and error message
+            fieldInput.addClass('border border-danger');
+            fieldErrorLabel.text(invalidErrorMessage);
+            fieldErrorLabel.show(); // Show the error message
+            $('#saveEmployeeButton').prop('disabled', true); // Disable the button
         } else {
-            // Clear the image preview if no file is selected
-            $('#imagePreview_u').attr('src', '').hide();
+            // Validation passed, remove red border, error message, and enable the button
+            fieldInput.removeClass('border border-danger');
+            fieldErrorLabel.hide(); // Hide the error message
+            $('#saveEmployeeButton').prop('disabled', false); // Enable the button
+        }
+    }
+
+    function validateField(fieldValue, fieldInput, fieldErrorLabel, fieldRegex, emptyErrorMessage, invalidErrorMessage) {
+        if (fieldValue === '') {
+            // Input is empty, show red border and error message
+            fieldInput.addClass('border border-danger');
+            fieldErrorLabel.text(emptyErrorMessage);
+            fieldErrorLabel.show(); // Show the error message
+            $('#saveEmployeeButton').prop('disabled', true); // Disable the button
+        } else if (!fieldRegex.test(fieldValue)) {
+            // Input doesn't match the regex pattern, show red border and error message
+            fieldInput.addClass('border border-danger');
+            fieldErrorLabel.text(invalidErrorMessage);
+            fieldErrorLabel.show(); // Show the error message
+            $('#saveEmployeeButton').prop('disabled', true); // Disable the button
+        } else {
+            // Validation passed, remove red border, error message, and enable the button
+            fieldInput.removeClass('border border-danger');
+            fieldErrorLabel.hide(); // Hide the error message
+            $('#saveEmployeeButton').prop('disabled', false); // Enable the button
         }
     }
 
