@@ -78,43 +78,9 @@ namespace Employee_Mnagement_System.Controllers
             return Json("Index");
         }
 
-        public IActionResult populateEditData(int? id)
+        public IActionResult populateEditData(int id)
         {
-            EmployeeModel employeeModel = null;
-
-            const string StoredProcedure = "GetEmployeeById";
-
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                using (MySqlCommand command = new MySqlCommand(StoredProcedure, connection))
-                {
-                    command.CommandType = CommandType.StoredProcedure;
-
-                    command.Parameters.AddWithValue("@Id", id);
-
-                    connection.Open();
-
-                    MySqlDataReader reader = command.ExecuteReader();
-
-                    while (reader.Read())
-                    {
-                        employeeModel = new EmployeeModel();
-
-                        // Id, FirstName, LastName, ContactNo, Age
-
-                        employeeModel.id = (int)reader["emp_id"];
-                        employeeModel.firstName = reader["first_name"].ToString();
-                        employeeModel.lastName = reader["last_name"].ToString();
-                        employeeModel.emailId = reader["email_id"].ToString();
-                        employeeModel.contactNo = reader["contact_no"].ToString();
-                        employeeModel.age = reader["emp_age"].ToString();
-                        employeeModel.profileImage = reader["profile_image"].ToString();
-
-                    }
-                }
-            }
-
-            return Json(employeeModel);
+            return Json(_IEmployeeBAL.PopulateUpdateData(id));
         }
 
         [HttpPost, RequestSizeLimit(25 * 1000 * 1024)]
@@ -123,150 +89,14 @@ namespace Employee_Mnagement_System.Controllers
 
             EmployeeModel employee = JsonSerializer.Deserialize<EmployeeModel>(model)!;
 
-            employee.id = id;
-
-            employee.imageFile = file;
-
-            // employee.ProfileImage = UploadImage(employee.imageFile);
-
-            try
-            {
-                // Get existing profile image from the database
-                string existingImage = null;
-
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    string StoredProcedure = "GetProfileImageById";
-
-                    using (MySqlCommand command = new MySqlCommand(StoredProcedure, connection))
-                    {
-                        command.CommandType = CommandType.StoredProcedure;
-                        command.Parameters.AddWithValue("@Id", employee.id);
-
-                        connection.Open();
-
-                        using (var reader = command.ExecuteReader())
-                        {
-                            while (reader.Read())
-                            {
-                                existingImage = reader["profile_image"].ToString();
-                            }
-                        }
-                    }
-                }
-
-                // If a new image file is uploaded, update the profile image
-                if (employee.imageFile != null)
-                {
-                    // Delete the old image file if it exists
-                    if (!string.IsNullOrEmpty(existingImage))
-                    {
-                        string oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", existingImage);
-
-                        if (System.IO.File.Exists(oldImagePath))
-                        {
-                            System.IO.File.Delete(oldImagePath);
-                        }
-                    }
-
-                    employee.profileImage = UploadImage(employee.imageFile);
-                }
-                else
-                {
-                    // If no new image is provided, use the existing image
-                    employee.profileImage = existingImage;
-                }
-
-                using (MySqlConnection connection = new MySqlConnection(connectionString))
-                {
-                    string StoredProcedure = "UpdateEmployee";
-
-                    using (MySqlCommand command = new MySqlCommand(StoredProcedure, connection))
-                    {
-                        command.CommandType = CommandType.StoredProcedure;
-
-                        command.Parameters.AddWithValue("@Id", employee.id);
-                        command.Parameters.AddWithValue("@FirstName", employee.firstName);
-                        command.Parameters.AddWithValue("@LastName", employee.lastName);
-                        command.Parameters.AddWithValue("@ContactNo", employee.contactNo);
-                        command.Parameters.AddWithValue("@EmailId", employee.emailId);
-                        command.Parameters.AddWithValue("@Age", employee.age);
-                        command.Parameters.AddWithValue("@ProfileImage", employee.profileImage);
-
-                        connection.Open();
-
-                        command.ExecuteNonQuery();
-
-                    }
-                }
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+            _IEmployeeBAL.UpdateEmployee(id, employee, file);
+            
             return Json("Index");
         }
 
-        public IActionResult Delete(int? id)
+        public IActionResult Delete(int id)
         {
-
-            // get existing profile image from database
-            string existingImage = null;
-
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                // string queryString = "SELECT profile_image FROM employee WHERE emp_id = @Id;";
-
-                string StoredProcedure = "GetProfileImageById";
-
-                using (MySqlCommand command = new MySqlCommand(StoredProcedure, connection))
-                {
-                    command.CommandType = CommandType.StoredProcedure;
-
-                    command.Parameters.AddWithValue("@Id", id);
-
-                    connection.Open();
-
-                    using (var reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            existingImage = reader["profile_image"].ToString();
-                        }
-                    }
-                }
-            }
-
-            // Delete the old image file if it exists
-
-            if (!string.IsNullOrEmpty(existingImage))
-            {
-                string oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", existingImage);
-
-                if (System.IO.File.Exists(oldImagePath))
-                {
-                    System.IO.File.Delete(oldImagePath);
-                }
-            }
-
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                // string queryString = "DELETE FROM employee WHERE emp_id = @Id";
-
-                string StoredProcedure = "DeleteEmployee";
-
-                using (MySqlCommand command = new MySqlCommand(StoredProcedure, connection))
-                {
-                    command.CommandType = CommandType.StoredProcedure;
-
-                    command.Parameters.AddWithValue("@Id", id);
-
-                    connection.Open();
-
-                    command.ExecuteNonQuery();
-                }
-            }
+            _IEmployeeBAL.DeleteEmployee(id);
 
             return RedirectToAction("Index");
         }

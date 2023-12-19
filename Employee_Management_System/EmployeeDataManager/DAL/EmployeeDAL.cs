@@ -60,7 +60,76 @@ namespace Employee_Management_System.EmployeeDataManager.DAL
             return employeeModel;
         }
 
-        
+        public EmployeeModel PopulateUpdateData(int id)
+        {
+            _dBManager.InitDbCommand("GetEmployeeById");
 
+            EmployeeModel employeeModel = null;
+
+            _dBManager.AddCMDParam("@Id", id);
+
+            DataSet ds = _dBManager.ExecuteDataSet();
+
+            foreach (DataRow item in ds.Tables[0].Rows)
+            {
+                employeeModel = new EmployeeModel();
+
+                // employeeModel.Id = CommonConversion.ConvertDBNullToInt(item["emp_id"]);
+                employeeModel.id = item["emp_id"].ConvertDBNullToInt();
+                employeeModel.firstName = item["first_name"].ConvertDBNullToString();
+                employeeModel.lastName = item["last_name"].ConvertDBNullToString();
+                employeeModel.emailId = item["email_id"].ConvertJSONNullToString();
+                employeeModel.contactNo = item["contact_no"].ConvertJSONNullToString();
+                employeeModel.age = item["emp_age"].ConvertJSONNullToString();
+                employeeModel.profileImage = item["profile_image"].ConvertJSONNullToString();
+
+            }
+
+            return employeeModel;
+        }
+
+        public EmployeeModel UpdateEmployee(EmployeeModel employeeModel)
+        {
+            _dBManager.InitDbCommand("UpdateEmployee");
+
+            _dBManager.AddCMDParam("@Id", employeeModel.id);
+            _dBManager.AddCMDParam("@FirstName", employeeModel.firstName);
+            _dBManager.AddCMDParam("@LastName", employeeModel.lastName);
+            _dBManager.AddCMDParam("@ContactNo", employeeModel.contactNo);
+            _dBManager.AddCMDParam("@EmailId", employeeModel.emailId);
+            _dBManager.AddCMDParam("@Age", employeeModel.age);
+            _dBManager.AddCMDParam("@ProfileImage", employeeModel.profileImage);
+
+            _dBManager.ExecuteNonQuery();
+
+            return employeeModel;
+        }
+
+        public void DeleteEmployee(int id)
+        {
+            _dBManager.InitDbCommand("DeleteEmployee");
+
+            _dBManager.AddCMDParam("@Id", id);
+
+            _dBManager.ExecuteNonQuery();
+        }
+
+        public string GetProfileImageById(int id)
+        {
+            string existingImage = null;
+
+            _dBManager.InitDbCommand("GetProfileImageById");
+
+            _dBManager.AddCMDParam("@Id", id);
+
+            DataSet ds = _dBManager.ExecuteDataSet();
+
+            foreach (DataRow item in ds.Tables[0].Rows)
+            {
+                existingImage = item["profile_image"].ConvertJSONNullToString();
+            }
+
+            return existingImage;
+        }
     }
 }

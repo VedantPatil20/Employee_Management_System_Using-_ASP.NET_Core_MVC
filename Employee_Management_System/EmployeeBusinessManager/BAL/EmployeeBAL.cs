@@ -2,6 +2,7 @@
 using Employee_Management_System.EmployeeDataManager.DAL;
 using Employee_Management_System.EmployeeDataManager.IDAL;
 using Employee_Management_System.Models;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Employee_Management_System.EmployeeBusinessManager.BAL
 {
@@ -69,6 +70,51 @@ namespace Employee_Management_System.EmployeeBusinessManager.BAL
             {
                 return ex.Message;
             }
+        }
+
+        public EmployeeModel PopulateUpdateData(int id)
+        {
+            return _IEmployeeDAL.PopulateUpdateData(id);
+        }
+
+        public EmployeeModel UpdateEmployee(int id, EmployeeModel employeeModel, IFormFile file)
+        {
+            employeeModel.id = id;
+
+            employeeModel.imageFile = file;
+
+            string existingImage = _IEmployeeDAL.GetProfileImageById(id);
+
+            // If a new image file is uploaded, update the profile image
+            if (employeeModel.imageFile != null)
+            {
+                employeeModel.profileImage = UploadImage(employeeModel.imageFile);
+            }
+            else
+            {
+                // If no new image is provided, use the existing image
+                employeeModel.profileImage = existingImage;
+            }
+
+            return employeeModel;
+
+        }
+
+        public void DeleteEmployee(int id)
+        {
+            string existingImage = _IEmployeeDAL.GetProfileImageById(id);
+
+            if (!string.IsNullOrEmpty(existingImage))
+            {
+                string oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", existingImage);
+
+                if (System.IO.File.Exists(oldImagePath))
+                {
+                    System.IO.File.Delete(oldImagePath);
+                }
+            }
+
+            _IEmployeeDAL.DeleteEmployee(id);
         }
     }
 }

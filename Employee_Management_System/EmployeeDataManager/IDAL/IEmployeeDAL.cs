@@ -11,9 +11,13 @@ namespace Employee_Management_System.EmployeeDataManager.IDAL
         public EmployeeModel AddEmployee(EmployeeModel employeeModel);
 
         // Populate data to Form Fields 
-        public EmployeeModel PopulateUpdateData(int id)
-        {
-            return null;
-        }
+        public EmployeeModel PopulateUpdateData(int id);
+
+        // Update data 
+        public EmployeeModel UpdateEmployee(EmployeeModel employeeModel);
+
+        public void DeleteEmployee(int id);
+
+        public string GetProfileImageById(int id);
     }
 }
