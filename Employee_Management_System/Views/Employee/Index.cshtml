@@ -65,7 +65,7 @@
                             <div class="row mb-2">
                                 <div class="col-12">
                                     <label for="firstName" class="form-label">First Name</label>
-                                    <input id="firstName" name="FirstName" type="text" class="form-control" autocomplete="off" onblur="formValidation()">
+                                    <input id="firstName" name="firstName" type="text" class="form-control" autocomplete="off" onblur="formValidation()">
                                     <span id="firstNameError" style="color: red; display: none;"></span>
                                 </div>
                             </div>
@@ -73,7 +73,7 @@
                             <div class="row mb-2">
                                 <div class="col-12">
                                     <label for="lastName" class="form-label">Last Name</label>
-                                    <input id="lastName" name="LastName" type="text" class="form-control" autocomplete="off">
+                                    <input id="lastName" name="lastName" type="text" class="form-control" autocomplete="off">
                                     <span id="lastNameError" style="color: red; display: none;"></span>
                                 </div>
                             </div>
@@ -81,7 +81,7 @@
                             <div class="row mb-2">
                                 <div class="col-12">
                                     <label for="emailId" class="form-label">Email</label>
-                                    <input id="emailId" name="EmailId" type="text" class="form-control" autocomplete="off">
+                                    <input id="emailId" name="emailId" type="text" class="form-control" autocomplete="off">
                                     <span id="emailIdError" style="color: red; display: none;"></span>
                                 </div>
                             </div>
@@ -89,12 +89,12 @@
                             <div class="row mb-2">
                                 <div class="col-8">
                                     <label for="contactNo" class="form-label">Contact No.</label>
-                                    <input id="contactNo" name="ContactNo" type="text" class="form-control" autocomplete="off">
+                                    <input id="contactNo" name="contactNo" type="text" class="form-control" autocomplete="off">
                                     <span id="contactNoError" style="color: red; display: none;"></span>
                                 </div>
                                 <div class="col-4">
                                     <label for="age" class="form-label">Age</label>
-                                    <input id="age" name="Age" type="text" class="form-control" autocomplete="off">
+                                    <input id="age" name="age" type="text" class="form-control" autocomplete="off">
                                     <span id="ageError" style="color: red; display: none;"></span>
                                 </div>
                             </div>
@@ -216,11 +216,11 @@ else
     function saveEmployee() {
 
         var employeeData = {
-            FirstName: $('#firstName').val(),
-            LastName: $('#lastName').val(),
-            EmailId: $('#emailId').val(),
-            ContactNo: $('#contactNo').val(),
-            Age: $('#age').val(),
+            firstName: $('#firstName').val(),
+            lastName: $('#lastName').val(),
+            emailId: $('#emailId').val(),
+            contactNo: $('#contactNo').val(),
+            age: $('#age').val(),
         }
 
         var formData = new FormData();
@@ -296,11 +296,11 @@ else
         debugger;
 
         var employeeData = {
-            FirstName: $('#firstName').val(),
-            LastName: $('#lastName').val(),
-            EmailId: $('#emailId').val(),
-            ContactNo: $('#contactNo').val(),
-            Age: $('#age').val(),
+            firstName: $('#firstName').val(),
+            lastName: $('#lastName').val(),
+            emailId: $('#emailId').val(),
+            contactNo: $('#contactNo').val(),
+            age: $('#age').val(),
         };
 
         debugger;
@@ -478,6 +478,7 @@ else
     }
 
     @* Function to remove the profile image and reset form fields *@
+    
     function RemoveProfile() {
 
         @* Reset profile image *@
@@ -497,85 +498,6 @@ else
         $('#add-profile').css('display', hasImage ? 'none' : 'block');
         $('#change-profile').css('display', hasImage ? 'block' : 'none');
         $('#remove-profile').css('display', hasImage ? 'block' : 'none');
-    }
-
-    // Validate form with required and regular expression
-    function formValidation() {
-        // Fetches the value entered in the input field values and removes any leading/trailing whitespace
-        var firstName = $('#firstName').val().trim();
-        var lastName = $('#lastName').val().trim();
-        var emailId = $('#emailId').val().trim();
-        var contactNo = $('#contactNo').val().trim();
-        var age = $('#age').val().trim();
-
-        // Selects the DOM element representing the input field using its ID's
-        var firstNameInput = $('#firstName');
-        var lastNameInput = $('#lastName');
-        var emailIdInput = $('#emailId');
-        var contactNoInput = $('#contactNo');
-        var ageInput = $('#age');
-
-        // Error label ID's for displaying error message
-        var firstNameErrorLabel = $('#firstNameError');
-        var lastNameErrorLabel = $('#lastNameError');
-        var emailIdErrorLabel = $('#emailIdError');
-        var contactNoErrorLabel = $('#contactNoError');
-        var ageErrorLabel = $('#ageError');
-
-        // Regular expression
-        var firstNameRegex = /^[A-Za-z]+$/; // Regex for First Name
-        var lastNameRegex = /^[A-Za-z]+$/; // Regex for last Name
-        var emailIdRegex = /^$/;
-        var contactNoRegex = /^$/;
-        var ageRegex = /^(?:100|[1-9][0-9]?)+$/; // Regex for age
-
-        validateField(firstName, firstNameInput, firstNameErrorLabel, firstNameRegex, 'First Name is required', 'Please enter a valid First Name with text only');
-        validateField(lastName, lastNameInput, lastNameErrorLabel, lastNameRegex, 'Last Name is required', 'Please enter a valid First Name with text only');
-        validateField(emailId, emailIdInput, emailIdErrorLabel, emailIdRegex, 'Email ID is required', 'Please enter a valid Email Address');
-        validateField(contactNo, contactNoInput, contactNoErrorLabel, contactNoRegex, 'Contact Number is required', 'Please enter a valid Contact Number');
-        validateField(age, ageInput, ageErrorLabel, ageRegex, 'Age is required', 'Please enter a valid Age');
-    }
-
-    function validateFirstName() {
-        if (firstName === '') {
-            // Input is empty, show red border and error message
-            firstNameInput.addClass('border border-danger');
-            firstNameErrorLabel.text('First Name is required.');
-            firstNameErrorLabel.show(); // Show the error message
-            $('#saveEmployeeButton').prop('disabled', true); // Disable the button
-        } else if (!fieldRegex.test(fieldValue)) {
-            // Input doesn't match the regex pattern, show red border and error message
-            fieldInput.addClass('border border-danger');
-            fieldErrorLabel.text(invalidErrorMessage);
-            fieldErrorLabel.show(); // Show the error message
-            $('#saveEmployeeButton').prop('disabled', true); // Disable the button
-        } else {
-            // Validation passed, remove red border, error message, and enable the button
-            fieldInput.removeClass('border border-danger');
-            fieldErrorLabel.hide(); // Hide the error message
-            $('#saveEmployeeButton').prop('disabled', false); // Enable the button
-        }
-    }
-
-    function validateField(fieldValue, fieldInput, fieldErrorLabel, fieldRegex, emptyErrorMessage, invalidErrorMessage) {
-        if (fieldValue === '') {
-            // Input is empty, show red border and error message
-            fieldInput.addClass('border border-danger');
-            fieldErrorLabel.text(emptyErrorMessage);
-            fieldErrorLabel.show(); // Show the error message
-            $('#saveEmployeeButton').prop('disabled', true); // Disable the button
-        } else if (!fieldRegex.test(fieldValue)) {
-            // Input doesn't match the regex pattern, show red border and error message
-            fieldInput.addClass('border border-danger');
-            fieldErrorLabel.text(invalidErrorMessage);
-            fieldErrorLabel.show(); // Show the error message
-            $('#saveEmployeeButton').prop('disabled', true); // Disable the button
-        } else {
-            // Validation passed, remove red border, error message, and enable the button
-            fieldInput.removeClass('border border-danger');
-            fieldErrorLabel.hide(); // Hide the error message
-            $('#saveEmployeeButton').prop('disabled', false); // Enable the button
-        }
     }
 
 </script>

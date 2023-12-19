@@ -1,4 +1,6 @@
-﻿using Employee_Management_System.Models;
+﻿using Employee_Management_System.EmployeeBusinessManager.BAL;
+using Employee_Management_System.EmployeeBusinessManager.IBAL;
+using Employee_Management_System.Models;
 using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using System.Data;
@@ -10,17 +12,18 @@ namespace Employee_Mnagement_System.Controllers
     {
         private readonly IConfiguration _configuration;
         private string connectionString;
+        IEmployeeBAL _IEmployeeBAL;
 
-        public EmployeeController(IConfiguration configuration)
+        public EmployeeController(IConfiguration configuration, IEmployeeBAL employeeBAL)
         {
             _configuration = configuration;
             connectionString = _configuration.GetConnectionString("DefaultConnection");
+            _IEmployeeBAL = employeeBAL;
         }
 
         public IActionResult Index()
         {
             List<EmployeeModel> employeeList = new List<EmployeeModel>();
-            // const string Query = "select * from employee;";
 
             const string StoredProcedure = "GetEmployeeData";
 
@@ -38,13 +41,13 @@ namespace Employee_Mnagement_System.Controllers
                     {
                         EmployeeModel employee = new EmployeeModel();
 
-                        employee.Id = (int)reader["emp_id"];
-                        employee.FirstName = reader["first_name"].ToString();
-                        employee.LastName = reader["last_name"].ToString();
-                        employee.EmailId = reader["email_id"].ToString();
-                        employee.ContactNo = reader["contact_no"].ToString();
-                        employee.Age = reader["emp_age"].ToString();
-                        employee.ProfileImage = reader["profile_image"].ToString();
+                        employee.id = (int)reader["emp_id"];
+                        employee.firstName = reader["first_name"].ToString();
+                        employee.lastName = reader["last_name"].ToString();
+                        employee.emailId = reader["email_id"].ToString();
+                        employee.contactNo = reader["contact_no"].ToString();
+                        employee.age = reader["emp_age"].ToString();
+                        employee.profileImage = reader["profile_image"].ToString();
 
                         employeeList.Add(employee);
                     }
@@ -53,95 +56,13 @@ namespace Employee_Mnagement_System.Controllers
             return View(employeeList);
         }
 
-        // List of all employees with JSON (AJAX Function)
+        // **List of all employees with JSON (AJAX Function)
         public IActionResult EmployeesList()
         {
-            List<EmployeeModel> employeeList = new List<EmployeeModel>();
-            // const string Query = "select * from employee;";
-
-            const string StoredProcedure = "GetEmployeeData";
-
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                using (MySqlCommand command = new MySqlCommand(StoredProcedure, connection))
-                {
-                    command.CommandType = CommandType.StoredProcedure;
-
-                    connection.Open();
-
-                    MySqlDataReader reader = command.ExecuteReader();
-
-                    while (reader.Read())
-                    {
-                        EmployeeModel employee = new EmployeeModel();
-
-                        employee.Id = (int)reader["emp_id"];
-                        employee.FirstName = reader["first_name"].ToString();
-                        employee.LastName = reader["last_name"].ToString();
-                        employee.EmailId = reader["email_id"].ToString();
-                        employee.ContactNo = reader["contact_no"].ToString();
-                        employee.Age = reader["emp_age"].ToString();
-                        employee.ProfileImage = reader["profile_image"].ToString();
-
-                        employeeList.Add(employee);
-                    }
-                }
-            }
-            return Json(employeeList);
+            return Json(_IEmployeeBAL.GetEmployeeList());
         }
 
-        // Get Employee Details by ID
-        public IActionResult GetEmployeeById(int? id)
-        {
-            EmployeeModel employeeModel = null;
-
-            if (id == null)
-            {
-                // Handle null ID case, maybe return an error message or handle it as per your application's logic
-                return BadRequest("Employee ID is null");
-            }
-
-            const string StoredProcedure = "GetEmployeeById"; // The stored procedure to fetch employee details
-
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                using (MySqlCommand command = new MySqlCommand(StoredProcedure, connection))
-                {
-                    command.CommandType = CommandType.StoredProcedure;
-
-                    command.Parameters.AddWithValue("@Id", id);
-
-                    connection.Open();
-
-                    using (MySqlDataReader reader = command.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            employeeModel = new EmployeeModel();
-
-                            // Populate the employeeModel object with retrieved data
-                            employeeModel.Id = (int)reader["emp_id"];
-                            employeeModel.FirstName = reader["first_name"].ToString();
-                            employeeModel.LastName = reader["last_name"].ToString();
-                            employeeModel.EmailId = reader["email_id"].ToString();
-                            employeeModel.ContactNo = reader["contact_no"].ToString();
-                            employeeModel.Age = reader["emp_age"].ToString();
-                            employeeModel.ProfileImage = reader["profile_image"].ToString();
-                        }
-                    }
-                }
-            }
-
-            if (employeeModel == null)
-            {
-                // Handle the case where no employee with the given ID was found
-                return NotFound("Employee not found");
-            }
-
-            return Json(employeeModel); // Return the employee details as JSON
-        }
-
-
+        // **
         public IActionResult Create()
         {
             return View();
@@ -150,34 +71,9 @@ namespace Employee_Mnagement_System.Controllers
         [HttpPost, RequestSizeLimit(25 * 1000 * 1024)]
         public IActionResult Create(string model, IFormFile file)
         {
-
             EmployeeModel employee = JsonSerializer.Deserialize<EmployeeModel>(model)!;
 
-            employee.imageFile = file;
-
-            employee.ProfileImage = UploadImage(employee.imageFile);
-
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-
-                const string StoredProcedure = "InsertEmployee";
-
-                using (MySqlCommand command = new MySqlCommand(StoredProcedure, connection))
-                {
-                    command.CommandType = CommandType.StoredProcedure;
-
-                    connection.Open();
-
-                    command.Parameters.AddWithValue("@FirstName", employee.FirstName);
-                    command.Parameters.AddWithValue("@LastName", employee.LastName);
-                    command.Parameters.AddWithValue("@EmailId", employee.EmailId);
-                    command.Parameters.AddWithValue("@ContactNo", employee.ContactNo);
-                    command.Parameters.AddWithValue("@Age", employee.Age);
-                    command.Parameters.AddWithValue("@ProfileImage", employee.ProfileImage);
-
-                    command.ExecuteNonQuery();
-                }
-            }
+            _IEmployeeBAL.AddEmployee(employee, file);
 
             return Json("Index");
         }
@@ -206,13 +102,13 @@ namespace Employee_Mnagement_System.Controllers
 
                         // Id, FirstName, LastName, ContactNo, Age
 
-                        employeeModel.Id = (int)reader["emp_id"];
-                        employeeModel.FirstName = reader["first_name"].ToString();
-                        employeeModel.LastName = reader["last_name"].ToString();
-                        employeeModel.EmailId = reader["email_id"].ToString();
-                        employeeModel.ContactNo = reader["contact_no"].ToString();
-                        employeeModel.Age = reader["emp_age"].ToString();
-                        employeeModel.ProfileImage = reader["profile_image"].ToString();
+                        employeeModel.id = (int)reader["emp_id"];
+                        employeeModel.firstName = reader["first_name"].ToString();
+                        employeeModel.lastName = reader["last_name"].ToString();
+                        employeeModel.emailId = reader["email_id"].ToString();
+                        employeeModel.contactNo = reader["contact_no"].ToString();
+                        employeeModel.age = reader["emp_age"].ToString();
+                        employeeModel.profileImage = reader["profile_image"].ToString();
 
                     }
                 }
@@ -227,7 +123,7 @@ namespace Employee_Mnagement_System.Controllers
 
             EmployeeModel employee = JsonSerializer.Deserialize<EmployeeModel>(model)!;
 
-            employee.Id = id;
+            employee.id = id;
 
             employee.imageFile = file;
 
@@ -245,7 +141,7 @@ namespace Employee_Mnagement_System.Controllers
                     using (MySqlCommand command = new MySqlCommand(StoredProcedure, connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
-                        command.Parameters.AddWithValue("@Id", employee.Id);
+                        command.Parameters.AddWithValue("@Id", employee.id);
 
                         connection.Open();
 
@@ -273,12 +169,12 @@ namespace Employee_Mnagement_System.Controllers
                         }
                     }
 
-                    employee.ProfileImage = UploadImage(employee.imageFile);
+                    employee.profileImage = UploadImage(employee.imageFile);
                 }
                 else
                 {
                     // If no new image is provided, use the existing image
-                    employee.ProfileImage = existingImage;
+                    employee.profileImage = existingImage;
                 }
 
                 using (MySqlConnection connection = new MySqlConnection(connectionString))
@@ -289,13 +185,13 @@ namespace Employee_Mnagement_System.Controllers
                     {
                         command.CommandType = CommandType.StoredProcedure;
 
-                        command.Parameters.AddWithValue("@Id", employee.Id);
-                        command.Parameters.AddWithValue("@FirstName", employee.FirstName);
-                        command.Parameters.AddWithValue("@LastName", employee.LastName);
-                        command.Parameters.AddWithValue("@ContactNo", employee.ContactNo);
-                        command.Parameters.AddWithValue("@EmailId", employee.EmailId);
-                        command.Parameters.AddWithValue("@Age", employee.Age);
-                        command.Parameters.AddWithValue("@ProfileImage", employee.ProfileImage);
+                        command.Parameters.AddWithValue("@Id", employee.id);
+                        command.Parameters.AddWithValue("@FirstName", employee.firstName);
+                        command.Parameters.AddWithValue("@LastName", employee.lastName);
+                        command.Parameters.AddWithValue("@ContactNo", employee.contactNo);
+                        command.Parameters.AddWithValue("@EmailId", employee.emailId);
+                        command.Parameters.AddWithValue("@Age", employee.age);
+                        command.Parameters.AddWithValue("@ProfileImage", employee.profileImage);
 
                         connection.Open();
 
@@ -402,18 +298,69 @@ namespace Employee_Mnagement_System.Controllers
                     {
                         EmployeeModel employee = new EmployeeModel();
 
-                        employee.Id = (int)reader["emp_id"];
-                        employee.FirstName = reader["first_name"].ToString();
-                        employee.LastName = reader["last_name"].ToString();
-                        employee.EmailId = reader["email_id"].ToString();
-                        employee.ContactNo = reader["contact_no"].ToString();
-                        employee.Age = reader["emp_age"].ToString();
+                        employee.id = (int)reader["emp_id"];
+                        employee.firstName = reader["first_name"].ToString();
+                        employee.lastName = reader["last_name"].ToString();
+                        employee.emailId = reader["email_id"].ToString();
+                        employee.contactNo = reader["contact_no"].ToString();
+                        employee.age = reader["emp_age"].ToString();
 
                         employeeList.Add(employee);
                     }
                 }
             }
             return View("Index", employeeList);
+        }
+
+        // Get Employee Details by ID
+        public IActionResult GetEmployeeById(int? id)
+        {
+            EmployeeModel employeeModel = null;
+
+            if (id == null)
+            {
+                // Handle null ID case, maybe return an error message or handle it as per your application's logic
+                return BadRequest("Employee ID is null");
+            }
+
+            const string StoredProcedure = "GetEmployeeById"; // The stored procedure to fetch employee details
+
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                using (MySqlCommand command = new MySqlCommand(StoredProcedure, connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    command.Parameters.AddWithValue("@Id", id);
+
+                    connection.Open();
+
+                    using (MySqlDataReader reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            employeeModel = new EmployeeModel();
+
+                            // Populate the employeeModel object with retrieved data
+                            employeeModel.id = (int)reader["emp_id"];
+                            employeeModel.firstName = reader["first_name"].ToString();
+                            employeeModel.lastName = reader["last_name"].ToString();
+                            employeeModel.emailId = reader["email_id"].ToString();
+                            employeeModel.contactNo = reader["contact_no"].ToString();
+                            employeeModel.age = reader["emp_age"].ToString();
+                            employeeModel.profileImage = reader["profile_image"].ToString();
+                        }
+                    }
+                }
+            }
+
+            if (employeeModel == null)
+            {
+                // Handle the case where no employee with the given ID was found
+                return NotFound("Employee not found");
+            }
+
+            return Json(employeeModel); // Return the employee details as JSON
         }
 
         // Upload Image to file system
@@ -457,6 +404,11 @@ namespace Employee_Mnagement_System.Controllers
             {
                 return ex.Message;
             }
+        }
+
+        public IActionResult Test()
+        {
+            return Json(_IEmployeeBAL.GetEmployeeList());
         }
 
     }

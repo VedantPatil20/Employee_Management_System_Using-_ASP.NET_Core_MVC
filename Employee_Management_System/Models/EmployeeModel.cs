@@ -2,19 +2,19 @@
 {
     public class EmployeeModel
     {
-        public int Id { get; set; }
+        public int id { get; set; }
 
-        public string FirstName { get; set; }
+        public string firstName { get; set; }
 
-        public string LastName { get; set; }
+        public string lastName { get; set; }
 
-        public string EmailId { get; set; }
+        public string emailId { get; set; }
 
-        public string ContactNo { get; set; }
+        public string contactNo { get; set; }
 
-        public string Age { get; set; }
+        public string age { get; set; }
 
-        public string ProfileImage { get; set; }
+        public string profileImage { get; set; }
 
         public IFormFile imageFile { get; set; }
 
