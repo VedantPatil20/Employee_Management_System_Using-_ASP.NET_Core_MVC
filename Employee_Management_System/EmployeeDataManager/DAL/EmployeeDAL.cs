@@ -116,15 +116,13 @@ namespace Employee_Management_System.EmployeeDataManager.DAL
 
         public bool CheckEmailExistence(string emailId)
         {
-            _dBManager.InitDbCommand("CheckEmailExistence");
+            _dBManager.InitDbCommand("CheckEmailExist");
 
             _dBManager.AddCMDParam("@p_EmailId", emailId);
 
-            _dBManager.AddCMDOutParam("@p_Exists", DbType.Boolean);
+            var result = _dBManager.ExecuteScalar();
 
-            _dBManager.ExecuteNonQuery();
-
-            bool emailExists = _dBManager.ConvertDBNullToBool();
+            bool emailExists = Convert.ToBoolean(result);
 
             return emailExists;
         }

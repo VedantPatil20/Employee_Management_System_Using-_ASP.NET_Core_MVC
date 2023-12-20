@@ -229,24 +229,27 @@
             Cache: false,
             success: function (data) {
 
-                swal({
-                    title: "Good job!",
-                    text: "Employee saved successfully!",
-                    icon: "success",
-                    button: "Ok",
-                });
+                if (data == null) {
+                    swal("Oops", "The email ID already exists. Please use a different email.", "error");
+                }
+                else {
+                    swal({
+                        title: "Good job!",
+                        text: "Employee saved successfully!",
+                        icon: "success",
+                        button: "Ok",
+                    });
 
-                clearForm();
+                    clearForm();
 
-                $('#employeeModal').modal('hide');
-                
-                // Reload the DataTable
-                get();
+                    $('#employeeModal').modal('hide');
 
+                    // Reload the DataTable
+                    get();
+                }
             },
             error: function (xhr, textStatus, errorThrown) {
-
-                if (xhr.responseText === "Email Id Already Exists!") {
+                if (xhr.status === 400 && xhr.responseText === "Email Id Already Exists!") {
                     swal("Oops", "The email ID already exists. Please use a different email.", "error");
                 }
                 else {

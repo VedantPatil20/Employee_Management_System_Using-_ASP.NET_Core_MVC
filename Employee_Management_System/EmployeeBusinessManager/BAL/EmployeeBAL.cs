@@ -32,7 +32,7 @@ namespace Employee_Management_System.EmployeeBusinessManager.BAL
 
             if (emailExists)
             {
-                throw new Exception("Email Id Already Exists!");
+                return null;
             }
             else
             {

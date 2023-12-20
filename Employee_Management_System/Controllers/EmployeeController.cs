@@ -75,7 +75,12 @@ namespace Employee_Mnagement_System.Controllers
         {
             EmployeeModel employee = JsonSerializer.Deserialize<EmployeeModel>(model)!;
 
-            _IEmployeeBAL.AddEmployee(employee, file);
+            var result = _IEmployeeBAL.AddEmployee(employee, file);
+
+            if (result == null)
+            {
+                return BadRequest("Email Id Already Exists!");
+            }
 
             return Json("Index");
 
