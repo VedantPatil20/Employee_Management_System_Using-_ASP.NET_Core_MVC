@@ -60,7 +60,7 @@ namespace Employee_Management_System.EmployeeDataManager.DAL
             return employeeModel;
         }
 
-        public EmployeeModel PopulateUpdateData(int id)
+        public EmployeeModel GetEmployeeById(int id)
         {
             _dBManager.InitDbCommand("GetEmployeeById");
 
@@ -112,6 +112,21 @@ namespace Employee_Management_System.EmployeeDataManager.DAL
             _dBManager.AddCMDParam("@Id", id);
 
             _dBManager.ExecuteNonQuery();
+        }
+
+        public bool CheckEmailExistence(string emailId)
+        {
+            _dBManager.InitDbCommand("CheckEmailExistence");
+
+            _dBManager.AddCMDParam("@p_EmailId", emailId);
+
+            _dBManager.AddCMDOutParam("@p_Exists", DbType.Boolean);
+
+            _dBManager.ExecuteNonQuery();
+
+            bool emailExists = _dBManager.ConvertDBNullToBool();
+
+            return emailExists;
         }
 
         public string GetProfileImageById(int id)

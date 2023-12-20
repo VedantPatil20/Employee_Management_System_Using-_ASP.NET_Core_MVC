@@ -17,19 +17,21 @@ namespace Employee_Management_System.EmployeeDataManager.DAL
             _DbConnection = dbcon;
         }
 
+        // Open MySQL Connection
         void Open()
         {
             if (_DbConnection.State != ConnectionState.Open)
                 _DbConnection.Open();
         }
 
-
+        // CLose MySQL Connection
         void Close()
         {
             if (_DbConnection.State != ConnectionState.Closed)
                 Close();
         }
 
+        // For Stored Procedure
         public DBManager InitDbCommand(string cmd)
         {
             InitDbCommand(cmd, CommandType.StoredProcedure);
@@ -45,6 +47,7 @@ namespace Employee_Management_System.EmployeeDataManager.DAL
             return this;
         }
 
+        // Add data to database
         public DBManager AddCMDParam(string parametername, object value)
         {
             _InputParam.Add(new()

@@ -15,21 +15,87 @@ namespace Employee_Management_System.EmployeeBusinessManager.BAL
             _IEmployeeDAL = new EmployeeDAL(dBManager);
         }
 
+        // **List All Employees
         List<EmployeeModel> IEmployeeBAL.GetEmployeeList()
         {
             return _IEmployeeDAL.GetEmployeeList();
         }
 
+        // **Add New Employee
         public EmployeeModel AddEmployee(EmployeeModel employeeModel, IFormFile file)
         {
             employeeModel.imageFile = file;
 
             employeeModel.profileImage = UploadImage(employeeModel.imageFile);
 
-            return _IEmployeeDAL.AddEmployee(employeeModel);
+            bool emailExists = CheckEmailExistence(employeeModel.emailId);
+
+            if (emailExists)
+            {
+                throw new Exception("Email Id Already Exists!");
+            }
+            else
+            {
+                return _IEmployeeDAL.AddEmployee(employeeModel);
+            }
         }
 
-        //Upload Image to File System (~/wwwroot/images/...jpg)
+        public EmployeeModel GetEmployeeById(int id)
+        {
+            return _IEmployeeDAL.GetEmployeeById(id);
+        }
+
+        public EmployeeModel UpdateEmployee(int id, EmployeeModel employeeModel, IFormFile file)
+        {
+            employeeModel.id = id;
+
+            employeeModel.imageFile = file;
+
+            string existingImage = _IEmployeeDAL.GetProfileImageById(id);
+
+            // If a new image file is uploaded, update the profile image
+            if (employeeModel.imageFile != null)
+            {
+                if (!string.IsNullOrEmpty(existingImage))
+                {
+                    string oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", existingImage);
+
+                    if (System.IO.File.Exists(oldImagePath))
+                    {
+                        System.IO.File.Delete(oldImagePath);
+                    }
+                }
+
+                employeeModel.profileImage = UploadImage(employeeModel.imageFile);
+            }
+            else
+            {
+                // If no new image is provided, use the existing image
+                employeeModel.profileImage = existingImage;
+            }
+
+            return _IEmployeeDAL.UpdateEmployee(employeeModel);
+
+        }
+
+        public void DeleteEmployee(int id)
+        {
+            string existingImage = _IEmployeeDAL.GetProfileImageById(id);
+
+            if (!string.IsNullOrEmpty(existingImage))
+            {
+                string oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", existingImage);
+
+                if (System.IO.File.Exists(oldImagePath))
+                {
+                    System.IO.File.Delete(oldImagePath);
+                }
+            }
+
+            _IEmployeeDAL.DeleteEmployee(id);
+        }
+
+        // **Upload Image to File System (~/wwwroot/images/...jpg)
         public string UploadImage(IFormFile imageFile)
         {
             try
@@ -72,49 +138,9 @@ namespace Employee_Management_System.EmployeeBusinessManager.BAL
             }
         }
 
-        public EmployeeModel PopulateUpdateData(int id)
+        public bool CheckEmailExistence(string emailId)
         {
-            return _IEmployeeDAL.PopulateUpdateData(id);
-        }
-
-        public EmployeeModel UpdateEmployee(int id, EmployeeModel employeeModel, IFormFile file)
-        {
-            employeeModel.id = id;
-
-            employeeModel.imageFile = file;
-
-            string existingImage = _IEmployeeDAL.GetProfileImageById(id);
-
-            // If a new image file is uploaded, update the profile image
-            if (employeeModel.imageFile != null)
-            {
-                employeeModel.profileImage = UploadImage(employeeModel.imageFile);
-            }
-            else
-            {
-                // If no new image is provided, use the existing image
-                employeeModel.profileImage = existingImage;
-            }
-
-            return employeeModel;
-
-        }
-
-        public void DeleteEmployee(int id)
-        {
-            string existingImage = _IEmployeeDAL.GetProfileImageById(id);
-
-            if (!string.IsNullOrEmpty(existingImage))
-            {
-                string oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", existingImage);
-
-                if (System.IO.File.Exists(oldImagePath))
-                {
-                    System.IO.File.Delete(oldImagePath);
-                }
-            }
-
-            _IEmployeeDAL.DeleteEmployee(id);
+            return _IEmployeeDAL.CheckEmailExistence(emailId);
         }
     }
 }

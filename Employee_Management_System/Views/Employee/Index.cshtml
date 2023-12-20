@@ -114,28 +114,21 @@
 
 <hr/>
 
-@if (Model.Any())
-{
-    <table id="emp-table" class="table table-responsive hover order-column" style="width:100%">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Profile</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Contact No</th>
-                <th>Email Id</th>
-                <th>Age</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
+<table id="emp-table" class="table table-responsive hover order-column" style="width:100%">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Profile</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Contact No</th>
+            <th>Email Id</th>
+            <th>Age</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
 
-    </table>
-}
-else
-{
-    <h2>No Data Available</h2>
-}
+</table>
 
 @* JavaScript and Ajax *@
 <script>
@@ -251,8 +244,15 @@ else
                 get();
 
             },
-            error: function (error) {
-                swal("Oops", "Error saving employee:", error, "error")
+            error: function (xhr, textStatus, errorThrown) {
+
+                if (xhr.responseText === "Email Id Already Exists!") {
+                    swal("Oops", "The email ID already exists. Please use a different email.", "error");
+                }
+                else {
+                    console.log("Error saving employee:", errorThrown);
+                    swal("Oops", "An error occurred while saving your data, Please try again later.", "error");
+                }
             }
         });
     }
@@ -263,7 +263,7 @@ else
         debugger;
         $.ajax({
             type: "GET",
-            url: "/Employee/populateEditData/" + employeeId, // Update URL based on your routing
+            url: "/Employee/GetEmployeeById/" + employeeId, // Update URL based on your routing
             success: function (employee) {
 
                 // Populate form fields with employee details
@@ -300,7 +300,7 @@ else
             lastName: $('#lastName').val(),
             emailId: $('#emailId').val(),
             contactNo: $('#contactNo').val(),
-            age: $('#age').val(),
+            age: $('#age').val()
         };
 
         debugger;
@@ -489,7 +489,7 @@ else
 
         @* hide corresponding buttons *@
         showButtons(false);
-    }
+    };
 
     @* Function to show/hide profile image action buttons based on whether an image is present *@
     function showButtons(hasImage) {
