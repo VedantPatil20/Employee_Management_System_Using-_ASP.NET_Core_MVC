@@ -85,6 +85,10 @@ namespace Employee_Mnagement_System.Controllers
             {
                 return Json("Contact Number Already Exists!");
             }
+            else if (result == "EmailAndContactNoExists")
+            {
+                return Json("Email Id and Contact Number Already Exists!");
+            }
 
             return Json("Index");
 

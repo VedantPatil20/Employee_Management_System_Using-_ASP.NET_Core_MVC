@@ -32,7 +32,11 @@ namespace Employee_Management_System.EmployeeBusinessManager.BAL
 
             bool contactNoExists = CheckContactNoExistence(employeeModel.contactNo);
 
-            if (emailExists)
+            if (emailExists && contactNoExists)
+            {
+                return "EmailAndContactNoExists";
+            }
+            else if (emailExists)
             {
                 return "EmailExists";
             }

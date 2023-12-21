@@ -87,12 +87,15 @@
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-8">
+                                <div class="col-12">
                                     <label for="contactNo" class="form-label">Contact No.</label>
                                     <input id="contactNo" name="contactNo" type="text" class="form-control" autocomplete="off">
                                     <span id="contactNoError" style="color: red; display: none;"></span>
                                 </div>
-                                <div class="col-4">
+                            </div>
+
+                            <div class="row mb-2">
+                                <div class="col-">
                                     <label for="age" class="form-label">Age</label>
                                     <input id="age" name="age" type="text" class="form-control" autocomplete="off">
                                     <span id="ageError" style="color: red; display: none;"></span>
@@ -208,6 +211,10 @@
     // Function for save anew employee
     function saveEmployee() {
 
+        if (!validateFormFields()) {
+            return;
+        }
+
         var employeeData = {
             firstName: $('#firstName').val(),
             lastName: $('#lastName').val(),
@@ -228,7 +235,13 @@
             processData: false,
             Cache: false,
             success: function (data) {
-                if (data === "Email Id Already Exists!") {
+                if (data === "Email Id and Contact Number Already Exists!") {
+                    $('#emailId').css('border-color', 'red');
+                    $('#emailIdError').text('The Email ID Already Exists!').show();
+                    $('#contactNo').css('border-color', 'red');
+                    $('#contactNoError').text('The Contact No Already Exists!').show();
+                }
+                else if (data === "Email Id Already Exists!") {
                     $('#emailId').css('border-color', 'red');
                     $('#emailIdError').text('The Email ID Already Exists!').show();
                 }
@@ -418,6 +431,8 @@
                 .text('Save Changes');
 
         } else if (action === 'edit') {
+
+            removeValidationError();
 
             // Set modal title for 'edit' action
             $('#employeeModalLabel').text('Update Employee');
