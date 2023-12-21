@@ -20,6 +20,8 @@ namespace Employee_Management_System.EmployeeDataManager.IDAL
 
         public bool CheckEmailExistence(string emailId);
 
+        public bool CheckContactNoExistence(string contactNo);
+
         // Get Profile Image By ID
         public string GetProfileImageById(int id);
     }

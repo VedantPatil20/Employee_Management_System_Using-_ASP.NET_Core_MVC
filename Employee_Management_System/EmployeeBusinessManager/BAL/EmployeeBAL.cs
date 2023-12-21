@@ -22,7 +22,7 @@ namespace Employee_Management_System.EmployeeBusinessManager.BAL
         }
 
         // **Add New Employee
-        public EmployeeModel AddEmployee(EmployeeModel employeeModel, IFormFile file)
+        public string AddEmployee(EmployeeModel employeeModel, IFormFile file)
         {
             employeeModel.imageFile = file;
 
@@ -30,13 +30,20 @@ namespace Employee_Management_System.EmployeeBusinessManager.BAL
 
             bool emailExists = CheckEmailExistence(employeeModel.emailId);
 
+            bool contactNoExists = CheckContactNoExistence(employeeModel.contactNo);
+
             if (emailExists)
             {
-                return null;
+                return "EmailExists";
+            }
+            else if (contactNoExists)
+            {
+                return "ContactNoExists";
             }
             else
             {
-                return _IEmployeeDAL.AddEmployee(employeeModel);
+                _IEmployeeDAL.AddEmployee(employeeModel);
+                return "Success";
             }
         }
 
@@ -141,6 +148,11 @@ namespace Employee_Management_System.EmployeeBusinessManager.BAL
         public bool CheckEmailExistence(string emailId)
         {
             return _IEmployeeDAL.CheckEmailExistence(emailId);
+        }
+
+        public bool CheckContactNoExistence(string contactNo)
+        {
+            return _IEmployeeDAL.CheckContactNoExistence(contactNo);
         }
     }
 }

@@ -77,9 +77,13 @@ namespace Employee_Mnagement_System.Controllers
 
             var result = _IEmployeeBAL.AddEmployee(employee, file);
 
-            if (result == null)
+            if (result == "EmailExists")
             {
-                return BadRequest("Email Id Already Exists!");
+                return Json("Email Id Already Exists!");
+            }
+            else if (result == "ContactNoExists")
+            {
+                return Json("Contact Number Already Exists!");
             }
 
             return Json("Index");

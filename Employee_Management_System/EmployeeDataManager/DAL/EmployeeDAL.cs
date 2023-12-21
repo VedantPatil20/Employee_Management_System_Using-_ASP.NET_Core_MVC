@@ -114,19 +114,6 @@ namespace Employee_Management_System.EmployeeDataManager.DAL
             _dBManager.ExecuteNonQuery();
         }
 
-        public bool CheckEmailExistence(string emailId)
-        {
-            _dBManager.InitDbCommand("CheckEmailExist");
-
-            _dBManager.AddCMDParam("@p_EmailId", emailId);
-
-            var result = _dBManager.ExecuteScalar();
-
-            bool emailExists = Convert.ToBoolean(result);
-
-            return emailExists;
-        }
-
         public string GetProfileImageById(int id)
         {
             string existingImage = null;
@@ -143,6 +130,33 @@ namespace Employee_Management_System.EmployeeDataManager.DAL
             }
 
             return existingImage;
+        }
+
+        public bool CheckEmailExistence(string emailId)
+        {
+            _dBManager.InitDbCommand("CheckEmailExist");
+
+            _dBManager.AddCMDParam("@p_EmailId", emailId);
+
+            var result = _dBManager.ExecuteScalar(); // object to return single value
+
+            bool emailExists = Convert.ToBoolean(result);
+
+            return emailExists;
+        }
+
+        public bool CheckContactNoExistence(string contactNo)
+        {
+            _dBManager.InitDbCommand("CheckContactNoExist");
+
+            _dBManager.AddCMDParam("@p_ContactNo", contactNo);
+
+            var result = _dBManager.ExecuteScalar(); // object to return single value
+
+            bool contactNoExists = Convert.ToBoolean(result); 
+
+            return contactNoExists;
+
         }
     }
 }

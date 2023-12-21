@@ -6,7 +6,7 @@ namespace Employee_Management_System.EmployeeBusinessManager.IBAL
     {
         List<EmployeeModel> GetEmployeeList();
 
-        public EmployeeModel AddEmployee(EmployeeModel employeeModel, IFormFile file);
+        public string AddEmployee(EmployeeModel employeeModel, IFormFile file);
 
         public EmployeeModel GetEmployeeById(int id);
 
@@ -15,6 +15,8 @@ namespace Employee_Management_System.EmployeeBusinessManager.IBAL
         public string UploadImage(IFormFile imageFile);
 
         public bool CheckEmailExistence(string emailId);
+
+        public bool CheckContactNoExistence(string contactNo);
 
         public void DeleteEmployee(int id);
     }

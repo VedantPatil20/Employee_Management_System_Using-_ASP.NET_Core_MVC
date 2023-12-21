@@ -65,7 +65,7 @@
                             <div class="row mb-2">
                                 <div class="col-12">
                                     <label for="firstName" class="form-label">First Name</label>
-                                    <input id="firstName" name="firstName" type="text" class="form-control" autocomplete="off" onblur="formValidation()">
+                                    <input id="firstName" name="firstName" type="text" class="form-control" autocomplete="off">
                                     <span id="firstNameError" style="color: red; display: none;"></span>
                                 </div>
                             </div>
@@ -228,9 +228,13 @@
             processData: false,
             Cache: false,
             success: function (data) {
-
-                if (data == null) {
-                    swal("Oops", "The email ID already exists. Please use a different email.", "error");
+                if (data === "Email Id Already Exists!") {
+                    $('#emailId').css('border-color', 'red');
+                    $('#emailIdError').text('The Email ID Already Exists!').show();
+                }
+                else if (data === "Contact Number Already Exists!") {
+                    $('#contactNo').css('border-color', 'red');
+                    $('#contactNoError').text('The Contact No Already Exists!').show();
                 }
                 else {
                     swal({
@@ -248,14 +252,9 @@
                     get();
                 }
             },
-            error: function (xhr, textStatus, errorThrown) {
-                if (xhr.status === 400 && xhr.responseText === "Email Id Already Exists!") {
-                    swal("Oops", "The email ID already exists. Please use a different email.", "error");
-                }
-                else {
-                    console.log("Error saving employee:", errorThrown);
-                    swal("Oops", "An error occurred while saving your data, Please try again later.", "error");
-                }
+            error: function (error) {
+                console.log("Error saving employee:", error);
+                swal("Oops", "An error occurred while saving your data, Please try again later.", "error");
             }
         });
     }
