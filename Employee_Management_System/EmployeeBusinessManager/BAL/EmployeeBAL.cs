@@ -2,7 +2,6 @@
 using Employee_Management_System.EmployeeDataManager.DAL;
 using Employee_Management_System.EmployeeDataManager.IDAL;
 using Employee_Management_System.Models;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Employee_Management_System.EmployeeBusinessManager.BAL
 {
@@ -56,7 +55,7 @@ namespace Employee_Management_System.EmployeeBusinessManager.BAL
             return _IEmployeeDAL.GetEmployeeById(id);
         }
 
-        public EmployeeModel UpdateEmployee(int id, EmployeeModel employeeModel, IFormFile file)
+        public string UpdateEmployee(int id, EmployeeModel employeeModel, IFormFile file)
         {
             employeeModel.id = id;
 
@@ -85,8 +84,27 @@ namespace Employee_Management_System.EmployeeBusinessManager.BAL
                 employeeModel.profileImage = existingImage;
             }
 
-            return _IEmployeeDAL.UpdateEmployee(employeeModel);
+            bool emailExists = CheckEmailExistence(employeeModel.emailId);
 
+            bool contactNoExists = CheckContactNoExistence(employeeModel.contactNo);
+
+            if (emailExists && contactNoExists)
+            {
+                return "EmailAndContactNoExists";
+            }
+            else if (emailExists)
+            {
+                return "EmailExists";
+            }
+            else if (contactNoExists)
+            {
+                return "ContactNoExists";
+            }
+            else
+            {
+                _IEmployeeDAL.UpdateEmployee(employeeModel);
+                return "Success";
+            }
         }
 
         public void DeleteEmployee(int id)

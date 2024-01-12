@@ -6,6 +6,7 @@ function validateFormFields() {
     var firstNameRegex = /^[a-zA-Z]+$/;
     if (firstName === '') {
         $('#firstNameError').text('First Name is Required').show();
+        $('firstName').css('border')
         isValid = false;
     }
     else if (!firstNameRegex.test(firstName)) {
@@ -112,8 +113,15 @@ $('#age').on('input', function () {
 });
 
 function removeValidationError() {
+
+    // Normalize input tags
+    $('#firstName').css('border-color', '');
+    $('#lastName').css('border-color', '');
+    $('#emailId').css('border-color', '');
+    $('#contactNo').css('border-color', '');
+    $('#age').css('border-color', '');
+
     // Clear previous error messages
-    $('#firstName', '#lastName', '#emailId', '#contactNo', '#age').css('border-color', '');
     $('#firstNameError').text('').hide();
     $('#lastNameError').text('').hide();
     $('#emailIdError').text('').hide();

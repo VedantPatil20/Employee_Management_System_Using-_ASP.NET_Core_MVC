@@ -11,50 +11,16 @@ namespace Employee_Mnagement_System.Controllers
 {
     public class EmployeeController : Controller
     {
-        private readonly IConfiguration _configuration;
-        private string connectionString;
         IEmployeeBAL _IEmployeeBAL;
 
         public EmployeeController(IConfiguration configuration, IEmployeeBAL employeeBAL)
         {
-            _configuration = configuration;
-            connectionString = _configuration.GetConnectionString("DefaultConnection");
             _IEmployeeBAL = employeeBAL;
         }
 
         public IActionResult Index()
         {
-            List<EmployeeModel> employeeList = new List<EmployeeModel>();
-
-            const string StoredProcedure = "GetEmployeeData";
-
-            using (MySqlConnection connection = new MySqlConnection(connectionString))
-            {
-                using (MySqlCommand command = new MySqlCommand(StoredProcedure, connection))
-                {
-                    command.CommandType = CommandType.StoredProcedure;
-
-                    connection.Open();
-
-                    MySqlDataReader reader = command.ExecuteReader();
-
-                    while (reader.Read())
-                    {
-                        EmployeeModel employee = new EmployeeModel();
-
-                        employee.id = (int)reader["emp_id"];
-                        employee.firstName = reader["first_name"].ToString();
-                        employee.lastName = reader["last_name"].ToString();
-                        employee.emailId = reader["email_id"].ToString();
-                        employee.contactNo = reader["contact_no"].ToString();
-                        employee.age = reader["emp_age"].ToString();
-                        employee.profileImage = reader["profile_image"].ToString();
-
-                        employeeList.Add(employee);
-                    }
-                }
-            }
-            return View(employeeList);
+            return View();
         }
 
         // *List of all employees
@@ -107,7 +73,20 @@ namespace Employee_Mnagement_System.Controllers
 
             EmployeeModel employee = JsonSerializer.Deserialize<EmployeeModel>(model)!;
 
-            _IEmployeeBAL.UpdateEmployee(id, employee, file);
+            var result = _IEmployeeBAL.UpdateEmployee(id, employee, file);
+
+            if (result == "EmailExists")
+            {
+                return Json("Email Id Already Exists!");
+            }
+            else if (result == "ContactNoExists")
+            {
+                return Json("Contact Number Already Exists!");
+            }
+            else if (result == "EmailAndContactNoExists")
+            {
+                return Json("Email Id and Contact Number Already Exists!");
+            }
             
             return Json("Index");
         }

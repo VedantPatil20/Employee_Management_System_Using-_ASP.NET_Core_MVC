@@ -1,10 +1,4 @@
-﻿@model IEnumerable<Employee_Management_System.Models.EmployeeModel>;
-
-@{
-    ViewData["title"] = "Employee Details";
-}
-
-<div class="container-fluid d-flex justify-content-between mt-2">
+﻿<div class="container-fluid d-flex justify-content-between mt-2">
     <div class="fs-3 fw-bold">Employee Details</div>
 
     <!-- Button trigger modal for Save Data -->
@@ -66,7 +60,7 @@
                                 <div class="col-12">
                                     <label for="firstName" class="form-label">First Name</label>
                                     <input id="firstName" name="firstName" type="text" class="form-control" autocomplete="off">
-                                    <span id="firstNameError" style="color: red; display: none;"></span>
+                                    <span id="firstNameError" style="color: red; display: none; font-size: 10px;"></span>
                                 </div>
                             </div>
 
@@ -74,7 +68,7 @@
                                 <div class="col-12">
                                     <label for="lastName" class="form-label">Last Name</label>
                                     <input id="lastName" name="lastName" type="text" class="form-control" autocomplete="off">
-                                    <span id="lastNameError" style="color: red; display: none;"></span>
+                                    <span id="lastNameError" style="color: red; display: none; font-size: 10px;"></span>
                                 </div>
                             </div>
 
@@ -82,23 +76,20 @@
                                 <div class="col-12">
                                     <label for="emailId" class="form-label">Email</label>
                                     <input id="emailId" name="emailId" type="text" class="form-control" autocomplete="off">
-                                    <span id="emailIdError" style="color: red; display: none;"></span>
+                                    <span id="emailIdError" style="color: red; display: none; font-size: 10px;"></span>
                                 </div>
                             </div>
 
                             <div class="row mb-2">
-                                <div class="col-12">
+                                <div class="col-8">
                                     <label for="contactNo" class="form-label">Contact No.</label>
                                     <input id="contactNo" name="contactNo" type="text" class="form-control" autocomplete="off">
-                                    <span id="contactNoError" style="color: red; display: none;"></span>
+                                    <span id="contactNoError" style="color: red; display: none; font-size: 10px;"></span>
                                 </div>
-                            </div>
-
-                            <div class="row mb-2">
-                                <div class="col-">
+                                <div class="col-4">
                                     <label for="age" class="form-label">Age</label>
                                     <input id="age" name="age" type="text" class="form-control" autocomplete="off">
-                                    <span id="ageError" style="color: red; display: none;"></span>
+                                    <span id="ageError" style="color: red; display: none; font-size: 10px;"></span>
                                 </div>
                             </div>
 
@@ -136,6 +127,7 @@
 @* JavaScript and Ajax *@
 <script>
 
+
     $(document).ready(function () {
         debugger;
         get();
@@ -150,7 +142,7 @@
         }
 
         $.ajax({
-            type: "GET",
+            type: "POST",
             url: "/Employee/EmployeesList",
             success: function (data) {
                 $('#emp-table').DataTable({
@@ -222,6 +214,8 @@
             contactNo: $('#contactNo').val(),
             age: $('#age').val(),
         }
+
+        console.log(employeeData);
 
         var formData = new FormData();
         formData.append("model", JSON.stringify(employeeData));
@@ -334,24 +328,41 @@
             contentType: false,
             processData: false,
             success: function (data) {
-                // Assuming the controller returns a JSON result, check for success or error
-                if (data === "Index") {
 
-                    swal({
-                        title: "Good job!",
-                        text: "Employee details updated successfully!",
-                        icon: "success",
-                        button: "Ok",
-                    });
+                if (data === "Email Id and Contact Number Already Exists!") {
+                    $('#emailId').css('border-color', 'red');
+                    $('#emailIdError').text('The Email ID Already Exists!').show();
+                    $('#contactNo').css('border-color', 'red');
+                    $('#contactNoError').text('The Contact No Already Exists!').show();
+                }
+                else if (data === "Email Id Already Exists!") {
+                    $('#emailId').css('border-color', 'red');
+                    $('#emailIdError').text('The Email ID Already Exists!').show();
+                }
+                else if (data === "Contact Number Already Exists!") {
+                    $('#contactNo').css('border-color', 'red');
+                    $('#contactNoError').text('The Contact No Already Exists!').show();
+                }
+                else {
+                    // Assuming the controller returns a JSON result, check for success or error
+                    if (data === "Index") {
 
-                    $('#employeeModal').modal('hide');
-                    
-                    get();
+                        swal({
+                            title: "Good job!",
+                            text: "Employee details updated successfully!",
+                            icon: "success",
+                            button: "Ok",
+                        });
 
-                } else {
-                    // Handle errors or show appropriate messages
-                    console.error("Error updating employee:", data);
-                    swal("Oops", "Failed to update employee.Please check the console for details.", "error");
+                        $('#employeeModal').modal('hide');
+
+                        get();
+
+                    } else {
+                        // Handle errors or show appropriate messages
+                        console.error("Error updating employee:", data);
+                        swal("Oops", "Failed to update employee.Please check the console for details.", "error");
+                    }
                 }
             },
             error: function (error) {
@@ -420,6 +431,9 @@
 
             // Clear form fields when opening for 'save' action
             clearForm();
+
+            // Clear 
+            removeValidationError();
 
             // Set default image for 'save' action
             $('#imagePreview').attr('src', 'images/profile.png').show();

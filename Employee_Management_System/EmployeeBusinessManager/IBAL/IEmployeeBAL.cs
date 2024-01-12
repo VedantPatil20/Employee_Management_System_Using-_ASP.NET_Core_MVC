@@ -10,7 +10,7 @@ namespace Employee_Management_System.EmployeeBusinessManager.IBAL
 
         public EmployeeModel GetEmployeeById(int id);
 
-        public EmployeeModel UpdateEmployee(int id, EmployeeModel employeeModel, IFormFile file);
+        public string UpdateEmployee(int id, EmployeeModel employeeModel, IFormFile file);
 
         public string UploadImage(IFormFile imageFile);
 

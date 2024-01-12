@@ -46,16 +46,16 @@ namespace Employee_Management_System.EmployeeDataManager.DAL
         // Add New Employee
         public EmployeeModel AddEmployee(EmployeeModel employeeModel)
         {
-            _dBManager.InitDbCommand("InsertEmployee");
+            _dBManager.InitDbCommand("InsertEmployee")
 
-            _dBManager.AddCMDParam("@FirstName", employeeModel.firstName);
-            _dBManager.AddCMDParam("@LastName", employeeModel.lastName);
-            _dBManager.AddCMDParam("@EmailId", employeeModel.emailId);
-            _dBManager.AddCMDParam("@ContactNo", employeeModel.contactNo);
-            _dBManager.AddCMDParam("@Age", employeeModel.age);
-            _dBManager.AddCMDParam("@ProfileImage", employeeModel.profileImage);
+            .AddCMDParam("@FirstName", employeeModel.firstName)
+            .AddCMDParam("@LastName", employeeModel.lastName)
+            .AddCMDParam("@EmailId", employeeModel.emailId)
+            .AddCMDParam("@ContactNo", employeeModel.contactNo)
+            .AddCMDParam("@Age", employeeModel.age)
+            .AddCMDParam("@ProfileImage", employeeModel.profileImage)
 
-            _dBManager.ExecuteNonQuery();
+            .ExecuteNonQuery();
 
             return employeeModel;
         }
